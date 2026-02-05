@@ -11,6 +11,9 @@ import SettingsThemeComponent from "@/components/Settings/Settings.vue";
 import UserIndex from "@/components/User/UserIndex.vue";
 import HistoryIndex from "@/components/History/HistoryIndex.vue";
 import HistorySkillComponent from "@/components/History/Skill.vue";
+import HistoryToolsComponent from "@/components/History/Tools.vue";
+import HistoryEnvComponent from "@/components/History/Env.vue";
+import HistoryOtherComponent from "@/components/History/Other.vue";
 
 import NasIndex from "@/components/NAS/NasIndex.vue";
 import NasImageComponent from "@/components/NAS/MENU_IMAGE/Image.vue";
@@ -97,11 +100,35 @@ const router = createRouter({
           component: HistoryIndex,
         },
         {
+          path: "/history/tools",
+          name: "Tools",
+          components: {
+            default: HistoryIndex,
+            detail: HistoryToolsComponent,
+          },
+        },
+        {
           path: "/history/skill",
           name: "Skill",
           components: {
             default: HistoryIndex,
             detail: HistorySkillComponent,
+          },
+        },
+        {
+          path: "/history/env",
+          name: "Env",
+          components: {
+            default: HistoryIndex,
+            detail: HistoryEnvComponent,
+          },
+        },
+        {
+          path: "/history/other",
+          name: "Other",
+          components: {
+            default: HistoryIndex,
+            detail: HistoryOtherComponent,
           },
         },
       ],
