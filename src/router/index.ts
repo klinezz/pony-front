@@ -10,10 +10,12 @@ import SettingsThemeComponent from "@/components/Settings/Settings.vue";
 
 import UserIndex from "@/components/User/UserIndex.vue";
 import HistoryIndex from "@/components/History/HistoryIndex.vue";
+import HistorySkillComponent from "@/components/History/Skill.vue";
 
-import NasIndexView from "@/components/NAS/NasIndex.vue";
+import NasIndex from "@/components/NAS/NasIndex.vue";
 import NasImageComponent from "@/components/NAS/MENU_IMAGE/Image.vue";
 import NasVideoComponent from "@/components/NAS/MENU_IMAGE/Video.vue";
+import NasDocComponent from "@/components/NAS/MENU_IMAGE/Doc.vue";
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -37,14 +39,14 @@ const router = createRouter({
           path: "NAS/index",
           name: "NasIndex",
           components: {
-            default: NasIndexView,
+            default: NasIndex,
           },
         },
         {
           path: "NAS/image",
           name: "NasImage",
           components: {
-            default: NasIndexView, // 왼쪽 목록 유지
+            default: NasIndex, // 왼쪽 목록 유지
             detail: NasImageComponent, // 오른쪽 <RouterView name="detail" />에 표시
           },
         },
@@ -52,8 +54,16 @@ const router = createRouter({
           path: "NAS/video",
           name: "NasVideo",
           components: {
-            default: NasIndexView,
+            default: NasIndex,
             detail: NasVideoComponent,
+          },
+        },
+        {
+          path: "NAS/doc",
+          name: "NasDoc",
+          components: {
+            default: NasIndex,
+            detail: NasDocComponent,
           },
         },
         {
@@ -85,6 +95,14 @@ const router = createRouter({
           path: "history",
           name: "History",
           component: HistoryIndex,
+        },
+        {
+          path: "/history/skill",
+          name: "Skill",
+          components: {
+            default: HistoryIndex,
+            detail: HistorySkillComponent,
+          },
         },
       ],
     },

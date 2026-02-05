@@ -9,6 +9,7 @@ interface MediaFile {
   takenDate: string;
   latitude: string; // 혹은 number
   longitude: string; // 혹은 number
+  ThumbUrl: string;
 }
 
 const backendUrl = import.meta.env.VITE_API_BASE_URL;
@@ -37,7 +38,7 @@ const fetchFiles = async () => {
   try {
     // 💡 팁: type을 "IMAGE"로 보낼지 "VIDEO"로 보낼지 구분해 보세요.
     const res = await axios.get(`${backendUrl}/api/nas/all`, {
-      params: { type: "IMAGE" },
+      params: { type: "VIDEO" },
     });
     fileList.value = res.data;
   } catch (error) {
@@ -108,7 +109,7 @@ onMounted(fetchFiles);
     </div>
   </div>
 
-  <h3>NAS 미디어 라이브러리</h3>
+  <h3>NAS 미디어 동영상</h3>
 
   <div class="switch-album">
     <div class="grid">
@@ -119,7 +120,7 @@ onMounted(fetchFiles);
         @click="openDrawer(file)"
       >
         <div class="thumb-wrapper">
-          <img :src="file.fileUrl" loading="lazy" class="thumb-img" />
+          <img :src="file.ThumbUrl" loading="lazy" class="thumb-img" />
           <div v-if="file.fileType === 'VIDEO'" class="video-icon">▶</div>
         </div>
       </div>

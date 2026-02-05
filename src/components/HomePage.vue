@@ -21,38 +21,38 @@ const logout = async () => {
 
     <div id="body">
       <nav>
-        <div class="m_item">
-          <div class="m_sub_item">
-            <router-link to="/NAS/image">
+        <router-link to="/NAS/image">
+          <div class="m_item">
+            <div class="m_sub_item">
               <img src="/icon-nas.png" style="width: 27px" />
-            </router-link>
+            </div>
+            <div class="m_title">NAS</div>
           </div>
-          <div class="m_title">NAS</div>
-        </div>
-        <div class="m_item">
-          <div class="m_sub_item">
-            <router-link to="/settings">
+        </router-link>
+        <router-link to="/settings">
+          <div class="m_item">
+            <div class="m_sub_item">
               <img src="/icon-settings.png" style="width: 30px" />
-            </router-link>
+            </div>
+            <div class="m_title">설정</div>
           </div>
-          <div class="m_title">설정</div>
-        </div>
-        <div class="m_item">
-          <div class="m_sub_item">
-            <router-link to="/user">
+        </router-link>
+        <router-link to="/user">
+          <div class="m_item">
+            <div class="m_sub_item">
               <img src="/icon-user.png" style="width: 30px" />
-            </router-link>
+            </div>
+            <div class="m_title">사용자</div>
           </div>
-          <div class="m_title">사용자</div>
-        </div>
-        <div class="m_item">
-          <div class="m_sub_item">
-            <router-link to="/history">
+        </router-link>
+        <router-link to="/history">
+          <div class="m_item">
+            <div class="m_sub_item">
               <img src="/icon-record.png" style="width: 30px" />
-            </router-link>
+            </div>
+            <div class="m_title">이력</div>
           </div>
-          <div class="m_title">이력</div>
-        </div>
+        </router-link>
       </nav>
       <div style="height: 100vh; display: flex; flex-direction: row; flex: 1">
         <div id="main">

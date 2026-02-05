@@ -1,5 +1,11 @@
 <template>
-  <div>이력</div>
+  <div>
+    <ul>
+      <li>
+        <router-link to="/history/skill">Tools</router-link>
+      </li>
+    </ul>
+  </div>
 </template>
 
 <script>

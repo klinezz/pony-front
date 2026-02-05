@@ -1,5 +1,10 @@
 <template>
-  <div>프로필</div>
+  <div>
+    <ul>
+      <li>사용자 관리</li>
+      <li>권한 관리</li>
+    </ul>
+  </div>
 </template>
 
 <script>

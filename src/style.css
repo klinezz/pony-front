@@ -23,6 +23,8 @@ a {
   text-decoration: inherit;
 }
 a:hover {
+  text-decoration: none;
+  color: inherit;
   /* color: #535bf2; */
 }
 
@@ -51,9 +53,6 @@ button {
   cursor: pointer;
   transition: border-color 0.25s;
 }
-button:hover {
-  border-color: #646cff;
-}
 button:focus,
 button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
@@ -75,6 +74,9 @@ ul {
 }
 ul li {
   list-style: none;
+  margin-bottom: 13px;
+  font-size: 14px;
+  font-family: "Noto Sans KR", sans-serif !important;
 }
 input:focus {
   outline: none;
@@ -83,9 +85,6 @@ input:focus {
   :root {
     color: #213547;
     background-color: #ffffff;
-  }
-  a:hover {
-    color: #747bff;
   }
   button {
     background-color: #f9f9f9;
