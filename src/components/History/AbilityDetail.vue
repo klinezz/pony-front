@@ -17,6 +17,9 @@ const displayName = computed(() => {
 const displayDesc = computed(() => {
   return selectedSkill.value?.desc || "상세 설명 정보가 없습니다.";
 });
+onBeforeMount(() => {
+
+}),
 </script>
 
 <template>
@@ -53,6 +56,7 @@ const displayDesc = computed(() => {
   margin: 0;
   width: 100%;
   height: 100%;
+  overflow: hidden;
 }
 .back_btn {
   font-size: 14px;

@@ -76,11 +76,13 @@ watch(
           <RouterView></RouterView>
         </div>
         <div id="main2">
-          <router-view name="detail" v-slot="{ Component, route }">
-            <transition :name="dynamicTransition">
-              <component :is="Component" :key="route.path" />
-            </transition>
-          </router-view>
+          <div class="detail_container">
+            <router-view name="detail" v-slot="{ Component, route }">
+              <transition :name="dynamicTransition">
+                <component :is="Component" :key="route.path" />
+              </transition>
+            </router-view>
+          </div>
         </div>
       </div>
     </div>
@@ -174,15 +176,18 @@ nav .m_item .m_sub_item img {
 #main2 {
   flex: 1;
   margin: 0;
-  padding: 15px;
   background: #f4f7f9;
   box-sizing: content-box;
   text-align: left;
   position: relative;
-  overflow-y: hidden;
+  overflow: hidden;
+  overflow-y: scroll;
   height: calc(100vh - 50px);
   min-height: calc(100vh - 50px);
   max-height: calc(100vh - 50px);
+}
+#main2 .detail_container {
+  padding: 15px;
 }
 #header {
   display: flex;

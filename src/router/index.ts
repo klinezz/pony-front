@@ -186,4 +186,11 @@ router.beforeEach((to, _from, next) => {
     next();
   }
 });
+router.afterEach(() => {
+  // 전환이 시작되거나 끝날 때 스크롤 위치를 0으로 초기화
+  const container = document.getElementById("main2");
+  if (container) {
+    container.scrollTo(0, 0);
+  }
+});
 export default router;
