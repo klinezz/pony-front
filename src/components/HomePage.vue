@@ -1,13 +1,30 @@
 <script setup>
 import { RouterView, RouterLink } from "vue-router";
-import { useRouter } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 import { useAuthStore } from "@/store/auth";
+import { ref, watch } from "vue";
 const authStore = useAuthStore();
 const router = useRouter();
+const route = useRoute();
 const logout = async () => {
   await authStore.logout();
   router.push("/login");
 };
+const transitionName = ref("");
+const dynamicTransition = ref("");
+
+watch(
+  () => route.name,
+  (to, from) => {
+    if (from === "Ability" && to === "AbilityDetail") {
+      dynamicTransition.value = "slide-next";
+    } else if (from === "AbilityDetail" && to === "Ability") {
+      dynamicTransition.value = "slide-prev";
+    } else {
+      dynamicTransition.value = "";
+    }
+  },
+);
 </script>
 <template>
   <div>
@@ -15,7 +32,7 @@ const logout = async () => {
       <div style="flex-grow: 1">PONY</div>
 
       <div id="btn_logout" @click="logout()">
-        <img src="@/assets/logout.png" width="60px" />
+        <img src="/icon-logout.png" width="27px" />
       </div>
     </div>
 
@@ -54,12 +71,16 @@ const logout = async () => {
           </div>
         </router-link>
       </nav>
-      <div style="height: 100vh; display: flex; flex-direction: row; flex: 1">
+      <div class="main_container" style="">
         <div id="main">
           <RouterView></RouterView>
         </div>
         <div id="main2">
-          <RouterView name="detail"></RouterView>
+          <router-view name="detail" v-slot="{ Component, route }">
+            <transition :name="dynamicTransition">
+              <component :is="Component" :key="route.path" />
+            </transition>
+          </router-view>
         </div>
       </div>
     </div>
@@ -74,8 +95,15 @@ const logout = async () => {
   width: 100vw;
   height: 50px;
   box-sizing: border-box;
-  background: #1264a3;
+  /* background: #1264a3; */
+  background: #0e0e0e;
   color: white;
+  display: flex;
+  flex-direction: row;
+  padding: 0 20px;
+}
+#header #btn_logout {
+  cursor: pointer;
 }
 #body {
   position: relative;
@@ -91,7 +119,8 @@ nav {
   width: 80px;
   flex-shrink: 0;
   text-align: left;
-  background: #1264a3;
+  /* background: #1264a3; */
+  background: #0e0e0e;
   color: white;
   padding-top: 20px;
 }
@@ -117,6 +146,12 @@ nav .m_item .m_sub_item {
 nav .m_item .m_sub_item img {
   width: 30px;
 }
+.main_container {
+  display: flex;
+  flex: 1;
+  flex-direction: row;
+  height: calc(100vh - 50px);
+}
 #main {
   display: flex;
   flex-direction: row;
@@ -127,22 +162,27 @@ nav .m_item .m_sub_item img {
   margin: -10px;
   margin-top: 0;
   margin-right: 0px;
-  background: #e8f0f6;
+  /* background: #e8f0f6; */
+  background: #272727;
   border-radius: 10px 0 0 17px;
   border-right: 1px solid #e1e1e1;
   box-sizing: content-box;
   text-align: left;
   position: relative;
+  color: white;
 }
 #main2 {
   flex: 1;
   margin: 0;
   padding: 15px;
-  background: #ffffff;
+  background: #f4f7f9;
   box-sizing: content-box;
-  height: initial;
   text-align: left;
   position: relative;
+  overflow-y: hidden;
+  height: calc(100vh - 50px);
+  min-height: calc(100vh - 50px);
+  max-height: calc(100vh - 50px);
 }
 #header {
   display: flex;
@@ -153,5 +193,46 @@ nav .m_item .m_sub_item img {
 }
 #btn_logout {
   cursor: pointer;
+}
+/* 1. 앞으로 가기 (Ability -> Detail) */
+.slide-next-enter-from {
+  transform: translateX(100%);
+}
+.slide-next-leave-to {
+  transform: translateX(-100%);
+}
+
+/* 2. 뒤로 가기 (Detail -> Ability) */
+.slide-prev-enter-from {
+  transform: translateX(-100%);
+}
+.slide-prev-leave-to {
+  transform: translateX(100%);
+}
+
+/* 공통 애니메이션 속성 */
+.slide-next-enter-active,
+.slide-prev-enter-active {
+  z-index: 2; /* 새 화면이 위로 오게 */
+}
+.slide-next-enter-active,
+.slide-next-leave-active,
+.slide-prev-enter-active,
+.slide-prev-leave-active {
+  position: absolute;
+  top: 15px; /* main2의 패딩값 */
+  left: 15px;
+  /* 부모 높이에서 패딩 상하값을 뺀 높이 고정 */
+  width: 100%;
+  height: calc(100vh - 50px);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  background: #f4f7f9; /* 배경색 일치 */
+}
+
+/* 나가는 요소가 들어오는 요소와 겹치게 처리 */
+.slide-next-leave-active,
+.slide-prev-leave-active {
+  position: absolute;
+  width: 100%;
 }
 </style>

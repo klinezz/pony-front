@@ -13,6 +13,15 @@
       <li>
         <router-link to="/history/other">Other</router-link>
       </li>
+      <li>
+        <router-link to="/history/ability">Ability</router-link>
+      </li>
+      <li>
+        <router-link to="/history/certification">Certification</router-link>
+      </li>
+      <li>
+        <router-link to="/history/project">Project</router-link>
+      </li>
     </ul>
   </div>
 </template>

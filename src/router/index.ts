@@ -14,6 +14,10 @@ import HistorySkillComponent from "@/components/History/Skill.vue";
 import HistoryToolsComponent from "@/components/History/Tools.vue";
 import HistoryEnvComponent from "@/components/History/Env.vue";
 import HistoryOtherComponent from "@/components/History/Other.vue";
+import HistoryAbilityComponent from "@/components/History/Ability.vue";
+import HistoryAbilityDetailComponent from "@/components/History/AbilityDetail.vue";
+import HistoryCertComponent from "@/components/History/Certification.vue";
+import HistoryProjectComponent from "@/components/History/Project.vue";
 
 import NasIndex from "@/components/NAS/NasIndex.vue";
 import NasImageComponent from "@/components/NAS/MENU_IMAGE/Image.vue";
@@ -129,6 +133,38 @@ const router = createRouter({
           components: {
             default: HistoryIndex,
             detail: HistoryOtherComponent,
+          },
+        },
+        {
+          path: "/history/ability",
+          name: "Ability",
+          components: {
+            default: HistoryIndex,
+            detail: HistoryAbilityComponent,
+          },
+        },
+        {
+          path: "/history/ability/:skillName",
+          name: "AbilityDetail",
+          components: {
+            default: HistoryIndex,
+            detail: HistoryAbilityDetailComponent,
+          },
+        },
+        {
+          path: "/history/certification",
+          name: "Certification",
+          components: {
+            default: HistoryIndex,
+            detail: HistoryCertComponent,
+          },
+        },
+        {
+          path: "/history/project",
+          name: "Project",
+          components: {
+            default: HistoryIndex,
+            detail: HistoryProjectComponent,
           },
         },
       ],
