@@ -17,9 +17,7 @@ const displayName = computed(() => {
 const displayDesc = computed(() => {
   return selectedSkill.value?.desc || "상세 설명 정보가 없습니다.";
 });
-onBeforeMount(() => {
-
-}),
+onBeforeMount(() => {});
 </script>
 
 <template>
