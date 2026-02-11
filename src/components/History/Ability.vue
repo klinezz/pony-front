@@ -1,8 +1,7 @@
 <script setup>
 import { ref, onMounted } from "vue";
-import { useRouter } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 import axios from "axios";
-
 const router = useRouter();
 const skillCategories = ref([]);
 // 명시적으로 null을 주어 처음에는 아무것도 열리지 않게 합니다.
@@ -30,11 +29,19 @@ const toggleCategory = (categoryId) => {
     activeCategory.value === categoryId ? null : categoryId;
 };
 
-const goToBoard = (item) => {
+const goToBoard = (categoryId, item) => {
   router.push({
     name: "AbilityDetail",
-    params: { skillName: item.name },
-    state: { skillData: item },
+    params: {
+      skillName: item.name,
+      categoryId: categoryId,
+    },
+    state: {
+      skillData: {
+        ...item,
+        categoryId: categoryId,
+      },
+    },
   });
 };
 </script>
@@ -76,7 +83,7 @@ const goToBoard = (item) => {
               v-for="item in cat.items"
               :key="item.name"
               class="sub_item"
-              @click="goToBoard(item)"
+              @click="goToBoard(activeCategory, item)"
             >
               <div class="item_name">
                 <span class="bullet">•</span>
