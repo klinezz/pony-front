@@ -30,7 +30,7 @@ const select = (name) => {
         :class="{ 'is-active': selectedItem === item.name }"
         @click="select(item.name)"
       >
-        <img :src="`/public/skill/${item.icon}`" :alt="item.name" />
+        <img :src="`/skill/${item.icon}`" :alt="item.name" />
         {{ item.name }}
       </div>
     </div>

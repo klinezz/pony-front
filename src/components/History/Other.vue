@@ -25,7 +25,7 @@ const select = (name) => {
         :class="{ 'is-active': selectedItem === tool.name }"
         @click="select(tool.name)"
       >
-        <img :src="`/public/skill/${tool.icon}`" :alt="tool.name" />
+        <img :src="`/skill/${tool.icon}`" :alt="tool.name" />
         <span>{{ tool.name }}</span>
       </div>
     </div>

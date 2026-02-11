@@ -83,7 +83,7 @@ onMounted(async () => {
     <div class="viewport">
       <div class="detail_header">
         <div class="title_group">
-          <img :src="`/public/skill/${displayIcon}`" style="width: 30px" />
+          <img :src="`/skill/${displayIcon}`" style="width: 30px" />
           <h3>{{ displayName }} Experience</h3>
         </div>
       </div>

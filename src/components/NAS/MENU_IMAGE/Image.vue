@@ -12,7 +12,6 @@ interface MediaFile {
   ThumbUrl: string;
 }
 
-const backendUrl = import.meta.env.VITE_API_BASE_URL;
 const fileList = ref<MediaFile[]>([]);
 const selectedFile = ref<MediaFile | null>(null);
 const isDrawerOpen = ref(false);
@@ -37,7 +36,7 @@ watch(
 const fetchFiles = async () => {
   try {
     // 💡 팁: type을 "IMAGE"로 보낼지 "VIDEO"로 보낼지 구분해 보세요.
-    const res = await axios.get(`${backendUrl}/api/nas/all`, {
+    const res = await axios.get("/api/nas/all", {
       params: { type: "IMAGE" },
     });
     fileList.value = res.data;

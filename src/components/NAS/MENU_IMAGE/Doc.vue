@@ -9,14 +9,12 @@ interface MediaFile {
   fileUrl: string;
 }
 
-const backendUrl = import.meta.env.VITE_API_BASE_URL;
-
 // 2. 타입을 MediaFile[]로 변경
 const fileList = ref<MediaFile[]>([]);
 const selectedFile = ref<MediaFile | null>(null);
 const fetchFiles = async () => {
   try {
-    const res = await axios.get(`${backendUrl}/api/nas/all`, {
+    const res = await axios.get("/api/nas/all", {
       params: { type: "IMAGE" },
     });
     fileList.value = res.data;
