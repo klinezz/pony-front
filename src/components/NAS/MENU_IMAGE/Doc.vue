@@ -15,7 +15,7 @@ const selectedFile = ref<MediaFile | null>(null);
 const fetchFiles = async () => {
   try {
     const res = await axios.get("/api/nas/all", {
-      params: { type: "IMAGE" },
+      params: { type: "VIDEO" },
     });
     fileList.value = res.data;
   } catch (error) {
@@ -32,13 +32,15 @@ onMounted(fetchFiles);
 </script>
 
 <template>
+  <div class="viewport">
+    <h2 class="menu_title">NAS 문서</h2>
+  </div>
   <div class="search">
     <input type="text" placeholder="검색어 입력" />
     <img
       src="https://s3.ap-northeast-2.amazonaws.com/cdn.wecode.co.kr/icon/search.png"
     />
   </div>
-  <h3>NAS 미디어 파일</h3>
   <div class="switch-album">
     <div class="grid">
       <div

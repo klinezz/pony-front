@@ -221,13 +221,6 @@ const goToBoard = (categoryId, item) => {
   color: #777;
 }
 
-.viewport {
-  margin: 0;
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-}
-
 /* --- 상세 페이지 스타일 --- */
 .detail_header {
   border-bottom: 2px solid #333;

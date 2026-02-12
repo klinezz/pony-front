@@ -1,8 +1,8 @@
 <script setup>
-import { RouterView, RouterLink } from "vue-router";
-import { useRoute, useRouter } from "vue-router";
+import { RouterView, RouterLink, useRoute, useRouter } from "vue-router";
 import { useAuthStore } from "@/store/auth";
-import { ref, watch } from "vue";
+import { computed, ref, watch } from "vue";
+import Breadcrumb from "primevue/breadcrumb";
 const authStore = useAuthStore();
 const router = useRouter();
 const route = useRoute();
@@ -25,6 +25,35 @@ watch(
     }
   },
 );
+
+const home = ref({
+  icon: "pi pi-home",
+  route: "/",
+});
+const menuItems =
+  router.options.routes
+    .find((r) => r.path === "/")
+    ?.children.filter((child) => child.meta?.isMenu) || [];
+
+const items = computed(() => {
+  // route.matched에서 정보를 가져와 Breadcrumb 형식으로 변환
+  return route.matched
+    .filter((m) => m.meta && m.meta.label && m.meta.label !== "HOME")
+    .map((m) => {
+      let label = m.meta.label;
+
+      // ✅ 만약 라벨이 ':'로 시작하면 params에서 해당 값을 찾아서 넣음
+      if (label.startsWith(":")) {
+        const paramName = label.substring(1); // 'skillName' 추출
+        label = route.params[paramName] || label; // 실제 값(예: 'Java')으로 교체
+      }
+
+      return {
+        label: label,
+        route: m.path,
+      };
+    });
+});
 </script>
 <template>
   <div>
@@ -37,37 +66,20 @@ watch(
     </div>
 
     <div id="body">
-      <nav>
-        <router-link to="/NAS/image">
+      <nav id="nav_var">
+        <router-link
+          v-for="menu in menuItems"
+          :key="menu.path"
+          :to="menu.path.startsWith('/') ? menu.path : `/${menu.path}`"
+        >
           <div class="m_item">
             <div class="m_sub_item">
-              <img src="/icon-nas.png" style="width: 27px" />
+              <img
+                :src="menu.meta.icon"
+                :style="{ width: menu.meta.label === 'NAS' ? '27px' : '30px' }"
+              />
             </div>
-            <div class="m_title">NAS</div>
-          </div>
-        </router-link>
-        <router-link to="/settings">
-          <div class="m_item">
-            <div class="m_sub_item">
-              <img src="/icon-settings.png" style="width: 30px" />
-            </div>
-            <div class="m_title">설정</div>
-          </div>
-        </router-link>
-        <router-link to="/user">
-          <div class="m_item">
-            <div class="m_sub_item">
-              <img src="/icon-user.png" style="width: 30px" />
-            </div>
-            <div class="m_title">사용자</div>
-          </div>
-        </router-link>
-        <router-link to="/history">
-          <div class="m_item">
-            <div class="m_sub_item">
-              <img src="/icon-record.png" style="width: 30px" />
-            </div>
-            <div class="m_title">이력</div>
+            <div class="m_title">{{ menu.meta.label }}</div>
           </div>
         </router-link>
       </nav>
@@ -76,6 +88,31 @@ watch(
           <RouterView></RouterView>
         </div>
         <div id="main2">
+          <div class="navigation-wrapper">
+            <Breadcrumb :home="home" :model="items">
+              <template #item="{ item, props }">
+                <router-link
+                  v-if="item.route"
+                  v-slot="{ href, navigate }"
+                  :to="item.route"
+                  custom
+                >
+                  <a :href="href" v-bind="props.action" @click="navigate">
+                    <span :class="[item.icon, 'text-color']" />
+                    <span class="font-bold">{{ item.label }}</span>
+                  </a>
+                </router-link>
+                <a
+                  v-else
+                  :href="item.url"
+                  :target="item.target"
+                  v-bind="props.action"
+                >
+                  <span class="text-color">{{ item.label }}</span>
+                </a>
+              </template>
+            </Breadcrumb>
+          </div>
           <div class="detail_container">
             <router-view name="detail" v-slot="{ Component, route }">
               <transition :name="dynamicTransition">
@@ -113,7 +150,7 @@ watch(
   display: flex;
   width: 100vw;
 }
-nav {
+#nav_var {
   position: relative;
   overflow: hidden;
   box-sizing: border-box;
@@ -126,17 +163,17 @@ nav {
   color: white;
   padding-top: 20px;
 }
-nav .m_item {
+#nav_var .m_item {
   width: calc(100% - 10px);
   box-sizing: content-box;
   cursor: pointer;
   text-align: center;
   margin-bottom: 17px;
 }
-nav .m_title {
+#nav_var .m_title {
   font-size: 12px;
 }
-nav .m_item .m_sub_item {
+#nav_var .m_item .m_sub_item {
   position: relative;
   height: 47px;
   box-sizing: content-box;
@@ -145,7 +182,7 @@ nav .m_item .m_sub_item {
   justify-content: center;
   align-items: center;
 }
-nav .m_item .m_sub_item img {
+#nav_var .m_item .m_sub_item img {
   width: 30px;
 }
 .main_container {
@@ -157,23 +194,22 @@ nav .m_item .m_sub_item img {
 #main {
   display: flex;
   flex-direction: row;
-  width: 150px;
   padding: 15px;
-  padding-left: 25px;
+  width: 150px;
   height: inherit;
   margin: -10px;
   margin-top: 0;
   margin-right: 0px;
-  /* background: #e8f0f6; */
   background: #272727;
   border-radius: 10px 0 0 17px;
-  border-right: 1px solid #e1e1e1;
   box-sizing: content-box;
   text-align: left;
   position: relative;
   color: white;
 }
 #main2 {
+  display: flex;
+  flex-direction: column;
   flex: 1;
   margin: 0;
   background: #f4f7f9;
@@ -181,13 +217,19 @@ nav .m_item .m_sub_item img {
   text-align: left;
   position: relative;
   overflow: hidden;
-  overflow-y: scroll;
   height: calc(100vh - 50px);
   min-height: calc(100vh - 50px);
   max-height: calc(100vh - 50px);
 }
 #main2 .detail_container {
+  flex: 1;
   padding: 15px;
+  position: relative;
+  overflow: hidden;
+  height: initial;
+  overflow-y: scroll;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
 #header {
   display: flex;
@@ -239,5 +281,32 @@ nav .m_item .m_sub_item img {
 .slide-prev-leave-active {
   position: absolute;
   width: 100%;
+}
+:deep(.p-breadcrumb) {
+  font-size: 12px;
+  flex: 0 0 auto; /* 높이가 줄어들거나 늘어나지 않게 고정 */
+  display: flex;
+  align-items: center;
+  height: 36px;
+  overflow: hidden;
+}
+:deep(.p-menu) {
+  min-width: 100% !important;
+  width: 100%;
+  background-color: transparent;
+  color: #ffffff;
+  border: 0px;
+  padding-left: 0;
+}
+:deep(.p-menu-item-content) {
+  color: #ffffff;
+  padding-left: 0;
+}
+:deep(.p-icon) {
+  width: 13px;
+  height: 15px;
+}
+:deep(.p-menu-list) {
+  padding: 0;
 }
 </style>

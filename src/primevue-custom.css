@@ -1,0 +1,67 @@
+/* src/assets/styles/primevue-custom.css */
+
+/* 1. 헤더 영역 배경색 및 글자색 */
+.p-datatable .p-datatable-thead > tr > th {
+  background-color: #f1f3f5 !important;
+  color: #495057;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+/* 2. 바디(데이터) 영역 배경색 및 폰트 크기 */
+.p-datatable {
+  font-size: 13px;
+}
+.p-datatable .p-datatable-tbody > tr {
+  background-color: #ffffff;
+}
+
+/* 3. 호버 및 선택 효과 */
+.p-datatable .p-datatable-tbody > tr:hover {
+  background-color: #f8f9fa !important;
+  cursor: pointer;
+}
+.p-datatable .p-datatable-tbody > tr.p-highlight {
+  background-color: #e7f5ff !important;
+  color: #007bff;
+}
+
+/* 4. 정렬 관련 */
+.header-center .p-datatable-column-header-content {
+  justify-content: center !important;
+}
+.text-center {
+  text-align: center !important;
+}
+
+/* 5. 에디터 스타일 */
+.post_content.ql-editor {
+  background-color: #ffffff !important;
+  min-height: 200px;
+}
+.post_content.ql-editor * {
+  background-color: transparent !important;
+}
+
+.p-menu-item:has(.active-menu-item),
+.p-menu-item.p-focus:has(.active-menu-item) {
+  background-color: #ffffff !important;
+  border-radius: 5px;
+}
+
+.p-menu-item-link.active-menu-item {
+  background-color: #ffffff !important;
+  color: #334155 !important;
+  border-radius: 5px;
+}
+
+.p-menu-item:has(.active-menu-item) .p-menu-item-content {
+  background-color: #ffffff !important;
+  color: #334155 !important;
+  border-radius: 5px;
+}
+
+.active-menu-item span,
+.active-menu-item .ml-2 {
+  color: #334155 !important;
+}

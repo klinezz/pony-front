@@ -9,7 +9,7 @@ interface MediaFile {
   takenDate: string;
   latitude: string; // 혹은 number
   longitude: string; // 혹은 number
-  ThumbUrl: string;
+  thumbnailUrl: string;
 }
 
 const fileList = ref<MediaFile[]>([]);
@@ -99,6 +99,9 @@ const getAddress = async (lat: string, lon: string) => {
 onMounted(fetchFiles);
 </script>
 <template>
+  <div class="viewport">
+    <h2 class="menu_title">NAS 동영상</h2>
+  </div>
   <div class="search-container">
     <div class="search">
       <input type="text" placeholder="검색어 입력" />
@@ -107,8 +110,6 @@ onMounted(fetchFiles);
       />
     </div>
   </div>
-
-  <h3>NAS 미디어 동영상</h3>
 
   <div class="switch-album">
     <div class="grid">
@@ -119,7 +120,7 @@ onMounted(fetchFiles);
         @click="openDrawer(file)"
       >
         <div class="thumb-wrapper">
-          <img :src="file.ThumbUrl" loading="lazy" class="thumb-img" />
+          <img :src="file.thumbnailUrl" loading="lazy" class="thumb-img" />
           <div v-if="file.fileType === 'VIDEO'" class="video-icon">▶</div>
         </div>
       </div>
@@ -135,7 +136,20 @@ onMounted(fetchFiles);
 
         <div class="drawer-content" v-if="selectedFile">
           <div class="preview-box">
-            <img :src="selectedFile.fileUrl" class="preview-img" />
+            <video
+              v-if="selectedFile.fileType === 'VIDEO'"
+              :key="selectedFile.fileUrl"
+              :src="selectedFile.fileUrl"
+              controls
+              autoplay
+              muted
+              playsinline
+              class="preview-video"
+            >
+              브라우저가 비디오 태그를 지원하지 않습니다.
+            </video>
+
+            <img v-else :src="selectedFile.fileUrl" class="preview-img" />
           </div>
 
           <div class="info-group">

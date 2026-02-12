@@ -7,14 +7,19 @@ import router from "@/router";
 import axios from "axios";
 import { computed, onMounted, ref } from "vue";
 import { useRoute } from "vue-router";
+import Dialog from "primevue/dialog";
 import AbilityWriteComponent from "./AbilityWriteComponent.vue";
 const route = useRoute();
 const selectedSkill = ref(null);
 const categoryId = ref("");
 const isWriting = ref(false);
 const boardList = ref([]);
+const selectedPost = ref(null);
 
-onMounted(() => {
+const isDetail = ref(false); // 상세 보기 모드 여부
+const isEditing = ref(false); // 수정 모드 여부
+
+onMounted(async () => {
   const stateData =
     window.history.state?.skillData || window.history.state?.usr?.skillData;
 
@@ -24,6 +29,7 @@ onMounted(() => {
   } else {
     selectedSkill.value = { name: route.params.skillName, desc: "" };
   }
+  await fetchList(); // 데이터 로드 후 목록 조회
 });
 
 const displayName = computed(() => selectedSkill.value?.name || "이름 없음");
@@ -69,13 +75,45 @@ const createBoard = async () => {
 const cancelWriting = () => {
   isWriting.value = false;
 };
-const onSaved = () => {
+const onSaved = (savedPost) => {
   isWriting.value = false;
+  isEditing.value = false;
+
+  selectedPost.value = savedPost;
+  isDetail.value = true;
   fetchList();
 };
-onMounted(async () => {
-  await fetchList(); // 데이터 로드 후 목록 조회
-});
+
+const onRowClick = (event) => {
+  selectedPost.value = event.data;
+  isDetail.value = true; // Dialog 대신 화면 전환
+};
+
+// 수정 모드 진입
+const enterEditMode = () => {
+  isEditing.value = true;
+};
+
+// 수정 취소
+const cancelEdit = () => {
+  isEditing.value = false;
+};
+
+// 글 삭제 함수
+const deletePost = async () => {
+  if (!confirm("정말 삭제하시겠습니까?")) return;
+  try {
+    await axios.post("/api/skill/deleteBoardContent", {
+      id: selectedPost.value.id,
+      tableName: categoryId.value,
+    });
+    alert("삭제되었습니다.");
+    isDetail.value = false;
+    fetchList();
+  } catch (e) {
+    alert("삭제 실패");
+  }
+};
 </script>
 
 <template>
@@ -92,8 +130,8 @@ onMounted(async () => {
         <div class="button_container">
           <Button
             @click="goBack"
-            label="목록"
-            icon="pi pi-list"
+            label="뒤로가기"
+            icon="pi pi-chevron-left"
             size="small"
             severity="primary"
           />
@@ -125,7 +163,62 @@ onMounted(async () => {
             @saved="onSaved"
           />
         </div>
+        <div v-else-if="isEditing" class="edit_section">
+          <AbilityWriteComponent
+            :category="categoryId"
+            :skill="displayName"
+            :initialData="selectedPost"
+            @cancel="cancelEdit"
+            @saved="onSaved"
+          />
+        </div>
 
+        <div v-else-if="isDetail" class="detail_view">
+          <div class="button_container">
+            <Button
+              label="목록"
+              icon="pi pi-list"
+              @click="isDetail = false"
+              size="small"
+              severity="primary"
+            />
+            <div
+              class="right_buttons"
+              style="margin-left: auto; display: flex; gap: 8px"
+            >
+              <Button
+                label="수정"
+                icon="pi pi-pencil"
+                @click="enterEditMode"
+                size="small"
+                severity="warn"
+              />
+              <Button
+                label="삭제"
+                icon="pi pi-trash"
+                @click="deletePost"
+                size="small"
+                severity="danger"
+              />
+            </div>
+          </div>
+
+          <div class="post_container">
+            <h2 class="post_title">{{ selectedPost.title }}</h2>
+            <div class="post_meta">
+              <span><i class="pi pi-user"></i> {{ selectedPost.author }}</span>
+              <span
+                ><i class="pi pi-calendar"></i>
+                {{ selectedPost.createdDt }}</span
+              >
+            </div>
+            <Divider />
+            <div
+              class="post_content ql-editor"
+              v-html="selectedPost.content"
+            ></div>
+          </div>
+        </div>
         <div v-else class="board_content">
           <DataTable
             :value="boardList"
@@ -169,23 +262,44 @@ onMounted(async () => {
           </DataTable>
 
           <div v-else class="empty_message">
-            "{{ displayName }}" 관련 등록된 경험이 없습니다.
+            "{{ displayName }}" 관련 등록된 글이 없습니다.
           </div>
 
           <Dialog
             v-model:visible="displayDetail"
             modal
             :header="selectedPost?.title"
-            :style="{ width: '50vw' }"
+            :style="{ width: '800px' }"
+            class="custom_dialog"
           >
-            <div class="post_meta">
-              <span>작성자: {{ selectedPost?.author }}</span> |
-              <span>날짜: {{ selectedPost?.createdDt }}</span>
+            <div class="post_meta" v-if="selectedPost">
+              <div class="meta_item">
+                <i class="pi pi-user"></i>
+                <span>{{ selectedPost.author }}</span>
+              </div>
+              <Divider layout="vertical" />
+              <div class="meta_item">
+                <i class="pi pi-calendar"></i>
+                <span>{{ selectedPost.createdDt }}</span>
+              </div>
             </div>
-            <Divider />
-            <div class="post_content">
-              <pre>{{ selectedPost?.content }}</pre>
+
+            <div class="post_content_container" v-if="selectedPost">
+              <div
+                class="post_content ql-editor"
+                v-html="selectedPost.content"
+                style="background-color: #ffffff"
+              ></div>
             </div>
+
+            <template #footer>
+              <Button
+                label="닫기"
+                icon="pi pi-times"
+                @click="displayDetail = false"
+                class="p-button-text close_btn"
+              />
+            </template>
           </Dialog>
         </div>
       </div>
@@ -198,12 +312,6 @@ x
 .detail_header {
   padding-bottom: 20px;
   border-bottom: 2px solid #333;
-}
-.viewport {
-  margin: 0;
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
 }
 .back_btn {
   font-size: 14px;
@@ -271,48 +379,64 @@ x
   width: 250px; /* 포커스 시 길어지는 효과 */
   box-shadow: 0 0 0 2px rgba(18, 100, 163, 0.1);
 }
-:deep(.p-datatable .p-datatable-thead > tr > th) {
-  background-color: #f1f3f5 !important; /* 원하는 배경색 */
-  color: #495057; /* 글자색 */
+/* 메타 정보 스타일 */
+.post_meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #7f8c8d;
+  font-size: 0.9rem;
+  margin-bottom: 20px;
+  padding: 0 10px;
 }
 
-/* 2. 바디(데이터) 영역 배경색 */
-:deep(.p-datatable .p-datatable-tbody > tr) {
-  background-color: #ffffff;
+.meta_item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.detail_view {
+  animation: fadeIn 0.3s ease;
 }
 
-/* 3. 마우스 호버(Hover) 시 배경색 (행 위에 마우스 올렸을 때) */
-:deep(.p-datatable .p-datatable-tbody > tr:hover) {
-  background-color: #f8f9fa !important;
-  cursor: pointer;
+.post_container {
+  background: #ffffff;
+  padding: 20px;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  min-height: 500px;
 }
 
-/* 4. 선택된 행(Selected Row) 배경색 */
-:deep(.p-datatable .p-datatable-tbody > tr.p-highlight) {
-  background-color: #e7f5ff !important;
-  color: #007bff;
-}
-
-:deep(.header-center .p-datatable-column-header-content) {
-  justify-content: center !important;
-}
-
-/* 데이터 셀 텍스트 중앙 정렬 */
-:deep(.text-center) {
-  text-align: center !important;
-}
-:deep(.p-datatable) {
-  font-size: 13px; /* 기본은 보통 14~16px 사이입니다 */
-}
-
-/* 헤더만 더 굵거나 다르게 하고 싶을 때 */
-:deep(.p-datatable .p-datatable-thead > tr > th) {
-  font-size: 14px;
+.post_title {
   font-weight: 700;
+  margin-bottom: 15px;
+  color: #2c3e50;
 }
 
-/* 데이터 셀(Body) 글자 크기 */
-:deep(.p-datatable .p-datatable-tbody > tr > td) {
-  padding: 8px 12px; /* 폰트가 작아지면 패딩도 줄여주는 게 예쁩니다 */
+.post_meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  color: #7f8c8d;
+  font-size: 0.75rem;
+}
+
+.post_content {
+  border: 1px solid #e1e1e1;
+  border-radius: 8px;
+  box-sizing: content-box;
+  margin-top: 20px;
+  line-height: 1.6;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 </style>

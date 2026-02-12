@@ -9,7 +9,7 @@ interface MediaFile {
   takenDate: string;
   latitude: string; // 혹은 number
   longitude: string; // 혹은 number
-  ThumbUrl: string;
+  thumbnailUrl: string;
 }
 
 const fileList = ref<MediaFile[]>([]);
@@ -99,6 +99,9 @@ const getAddress = async (lat: string, lon: string) => {
 onMounted(fetchFiles);
 </script>
 <template>
+  <div class="viewport">
+    <h2 class="menu_title">NAS 이미지</h2>
+  </div>
   <div class="search-container">
     <div class="search">
       <input type="text" placeholder="검색어 입력" />
@@ -119,7 +122,7 @@ onMounted(fetchFiles);
         @click="openDrawer(file)"
       >
         <div class="thumb-wrapper">
-          <img :src="file.ThumbUrl" loading="lazy" class="thumb-img" />
+          <img :src="file.thumbnailUrl" loading="lazy" class="thumb-img" />
           <div v-if="file.fileType === 'VIDEO'" class="video-icon">▶</div>
         </div>
       </div>

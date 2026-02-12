@@ -1,24 +1,48 @@
 <script setup>
-import { ref } from "vue";
+import { onMounted, ref } from "vue";
 import axios from "axios";
 import Editor from "primevue/editor";
 
-const props = defineProps(["category", "skill"]);
+const props = defineProps(["category", "skill", "initialData"]);
 const emit = defineEmits(["cancel", "saved"]);
 
-const post = ref({ title: "", content: "", author: "Admin" });
-
+const post = ref({
+  title: "",
+  content: "",
+  author: "Admin",
+});
+onMounted(() => {
+  if (props.initialData) {
+    // 수정 모드: 기존 데이터를 복사하여 입력창에 채움
+    post.value = { ...props.initialData };
+  }
+});
 const submit = async () => {
+  if (!post.value.title.trim() || !post.value.content.trim()) {
+    alert("제목과 내용을 모두 입력해주세요.");
+    return;
+  }
+
   try {
-    await axios.post("/api/skill/addBoardSkillContent", {
+    const isUpdate = !!props.initialData?.id;
+    const requestData = {
       categoryId: props.category,
       skillName: props.skill,
-      ...post.value,
-    });
-    alert("저장되었습니다.");
-    emit("saved");
+      id: post.value.id || null, // 수정 시에는 id가 들어가고, 신규 등록 시에는 null이 감
+      title: post.value.title,
+      content: post.value.content,
+      author: post.value.author,
+    };
+    const res = await axios.post(
+      "/api/skill/addBoardSkillContent",
+      requestData,
+    );
+    alert(post.value.id ? "수정되었습니다." : "저장되었습니다.");
+    console.log(res);
+    emit("saved", res.data);
   } catch (e) {
-    alert("저장 실패");
+    console.error(e);
+    alert("저장 실패: " + (e.response?.data || "서버 오류"));
   }
 };
 </script>
@@ -36,7 +60,7 @@ const submit = async () => {
     <div class="editor_container">
       <Editor
         v-model="post.content"
-        editorStyle="height: 320px"
+        editorStyle="height: 320px; padding:10px; "
         placeholder="상세 내용을 입력하세요 (이미지, 표, 볼드 등 지원)"
       >
         <template #toolbar>
@@ -113,6 +137,7 @@ const submit = async () => {
 
 /* 에디터 내부 스타일 커스텀 */
 :deep(.p-editor-container .p-editor-content .ql-editor) {
+  padding: 20px !important;
   font-size: 12px;
   line-height: 1.6;
 }
