@@ -1,7 +1,7 @@
 <script setup>
 import { ref, computed, onMounted } from "vue";
 import dayjs from "dayjs";
-
+import Editor from "./Editor.vue";
 // --- [상태 관리] ---
 const now = ref(dayjs()); // 실시간 배경 및 시간 판단용
 const viewDate = ref(dayjs()); // 캘린더 화면 이동용
@@ -24,7 +24,10 @@ const timePeriod = computed(() => {
 
 const backgroundClass = computed(() => {
   // 날씨 상태가 API에서 오면 해당 상태 반영, 아니면 Clear 기준
-  const status = weatherMain.value ? weatherMain.value.toLowerCase() : "clear";
+  let status = weatherMain.value ? weatherMain.value.toLowerCase() : "clear";
+  if (["haze", "mist", "fog", "clouds"].includes(status)) {
+    status = "clouds";
+  }
   return `bg-${timePeriod.value}-${status}`;
 });
 
@@ -144,9 +147,9 @@ onMounted(() => {
     </div>
 
     <div id="schedule_container">
-      <!-- <div class="editor">
+      <div class="editor">
         <Editor ref="myEditor" />
-      </div> -->
+      </div>
 
       <div class="schedule_list">
         <div class="schedule_item">
@@ -186,6 +189,13 @@ onMounted(() => {
 #schedule_container {
   flex-grow: 1;
   padding: 0 15px;
+  min-width: 0;
+  width: 100%;
+}
+.editor {
+  background-color: #ffffff;
+  padding: 20px;
+  margin-bottom: 10px;
 }
 .schedule_list {
   display: flex;
