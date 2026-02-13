@@ -112,15 +112,6 @@ const goToBoard = (categoryId, item) => {
   flex-direction: column;
   width: 100%;
 }
-.menu_title {
-  font-size: 20px;
-  font-weight: 700;
-  color: #333;
-  padding-left: 5px;
-  margin-bottom: 20px;
-  border-left: 4px solid #1264a3;
-}
-
 /* 메인 행 스타일 */
 .main_row {
   display: flex;

@@ -10,6 +10,7 @@ const logout = async () => {
   await authStore.logout();
   router.push("/login");
 };
+const isDashboard = computed(() => route.name === "Dashboard");
 const transitionName = ref("");
 const dynamicTransition = ref("");
 
@@ -83,11 +84,13 @@ const items = computed(() => {
           </div>
         </router-link>
       </nav>
-      <div class="main_container" style="">
-        <div id="main">
-          <RouterView></RouterView>
-        </div>
-        <div id="main2">
+      <div class="main_container" :class="{ 'is-dashboard': isDashboard }">
+        <Transition name="slide-fade">
+          <div id="main" v-if="!isDashboard">
+            <RouterView></RouterView>
+          </div>
+        </Transition>
+        <div id="main2" :class="{ 'full-width': isDashboard }">
           <div class="navigation-wrapper">
             <Breadcrumb :home="home" :model="items">
               <template #item="{ item, props }">
@@ -113,12 +116,13 @@ const items = computed(() => {
               </template>
             </Breadcrumb>
           </div>
-          <div class="detail_container">
+          <div id="" class="detail_container">
             <router-view name="detail" v-slot="{ Component, route }">
               <transition :name="dynamicTransition">
                 <component :is="Component" :key="route.path" />
               </transition>
             </router-view>
+            <router-view v-if="isDashboard" />
           </div>
         </div>
       </div>
@@ -161,7 +165,8 @@ const items = computed(() => {
   /* background: #1264a3; */
   background: #0e0e0e;
   color: white;
-  padding-top: 20px;
+  padding-top: 12px;
+  z-index: 20;
 }
 #nav_var .m_item {
   width: calc(100% - 10px);
@@ -190,22 +195,23 @@ const items = computed(() => {
   flex: 1;
   flex-direction: row;
   height: calc(100vh - 50px);
+  background: #0e0e0e;
 }
 #main {
-  display: flex;
-  flex-direction: row;
-  padding: 15px;
-  width: 150px;
-  height: inherit;
-  margin: -10px;
-  margin-top: 0;
-  margin-right: 0px;
+  width: 200px; /* 고정 너비 */
+  min-width: 200px;
   background: #272727;
   border-radius: 10px 0 0 17px;
-  box-sizing: content-box;
-  text-align: left;
-  position: relative;
+  padding: 20px 15px;
+  box-sizing: border-box; /* content-box에서 border-box로 변경 (너비 계산 정확도) */
   color: white;
+  text-align: left;
+  overflow: hidden; /* 내부 내용이 너비 줄어들 때 깨지지 않게 */
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 10;
+  margin-top: 0;
+  background: #272727;
+  border-radius: 12px 0 0 0px;
 }
 #main2 {
   display: flex;
@@ -220,7 +226,23 @@ const items = computed(() => {
   height: calc(100vh - 50px);
   min-height: calc(100vh - 50px);
   max-height: calc(100vh - 50px);
+  transition: all 0.5s ease;
 }
+
+/* 슬라이드 애니메이션 효과 */
+.slide-fade-enter-active,
+.slide-fade-leave-active {
+  transition: all 0.5s ease;
+}
+
+.slide-fade-enter-from,
+.slide-fade-leave-to {
+  transform: translateX(-100%); /* 왼쪽으로 밀려남 */
+  opacity: 0;
+  flex: 0; /* 공간도 함께 사라지게 함 */
+  margin-right: -200px; /* 너비만큼 마이너스 마진으로 밀어줌 */
+}
+
 #main2 .detail_container {
   flex: 1;
   padding: 15px;
@@ -289,6 +311,8 @@ const items = computed(() => {
   align-items: center;
   height: 36px;
   overflow: hidden;
+  background-color: #edf1f1;
+  border-bottom: 1px solid #e1e1e1;
 }
 :deep(.p-menu) {
   min-width: 100% !important;

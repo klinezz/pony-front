@@ -64,15 +64,6 @@ const toggleCategory = (id) => {
 </template>
 
 <style scoped>
-.menu_title {
-  font-size: 20px;
-  font-weight: 700;
-  color: #333;
-  margin-bottom: 20px;
-  border-left: 4px solid #1264a3;
-  padding-left: 12px;
-}
-
 .project_list {
   display: flex;
   flex-direction: column;

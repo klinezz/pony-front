@@ -41,10 +41,10 @@ const router = createRouter({
       meta: { requiresAuth: false, label: "HOME" }, // 로그인 필요
       children: [
         {
-          path: "", // 빈 경로는 기본 대시보드로 이동
+          path: "/", // 빈 경로는 기본 대시보드로 이동
           name: "Dashboard",
           component: DashboardPage,
-          meta: { label: "Home" },
+          meta: { label: "Home", isMenu: true, icon: "/icon-home.png" },
         },
         {
           path: "NAS",
@@ -203,7 +203,7 @@ router.beforeEach((to, _from, next) => {
 });
 router.afterEach(() => {
   // 전환이 시작되거나 끝날 때 스크롤 위치를 0으로 초기화
-  const container = document.getElementById("main2");
+  const container = document.getElementById("main_detail");
   if (container) {
     container.scrollTo(0, 0);
   }

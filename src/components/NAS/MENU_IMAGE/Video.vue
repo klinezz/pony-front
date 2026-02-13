@@ -148,22 +148,19 @@ onMounted(fetchFiles);
             >
               브라우저가 비디오 태그를 지원하지 않습니다.
             </video>
-
             <img v-else :src="selectedFile.fileUrl" class="preview-img" />
           </div>
 
           <div class="info-group">
             <div class="info-section">
-              <p>{{ selectedFile.takenDate || "날짜 정보 없음" }}</p>
+              <p class="taken-date">
+                {{ selectedFile.takenDate || "날짜 정보 없음" }}
+              </p>
+              <p class="address">{{ address }}</p>
             </div>
-
-            <div class="info-section">
-              <p>{{ address }}</p>
+            <div class="info-list">
+              <p><strong>파일명:</strong> {{ selectedFile.fileName }}</p>
             </div>
-          </div>
-
-          <div class="info-list">
-            <p><strong>파일명:</strong> {{ selectedFile.fileName }}</p>
           </div>
         </div>
       </div>
@@ -282,39 +279,67 @@ input {
   position: fixed;
   top: 0;
   right: 0;
-  width: 500px;
+  width: 700px; /* Drawer 너비 고정 */
   height: 100%;
-  background-color: #2d2d2d; /* 닌텐도 다크 테두리 색상 */
+  background-color: #2d2d2d;
   box-shadow: -5px 0 15px rgba(0, 0, 0, 0.5);
   z-index: 2000;
-  padding: 20px;
+  padding: 20px; /* 여백 넉넉히 */
   color: white;
+  display: flex;
+  flex-direction: column;
 }
 
-/* 배경 오버레이 */
-.overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.6);
-  z-index: 1500;
+/* ✅ 중앙 정렬 핵심 */
+.drawer-content {
+  flex: 1; /* 남은 높이 전체 차지 */
+  display: flex;
+  flex-direction: column;
+  justify-content: top; /* 세로 중앙 */
+  align-items: center; /* 가로 중앙 */
+  gap: 20px;
 }
 
-/* 상세 정보 스타일 */
+/* ✅ 원본 비율 유지 박스 */
 .preview-box {
-  width: 100%;
-  aspect-ratio: 16 / 9;
+  width: auto; /* 너비는 영상 비율에 맞춰 자동 */
+  max-width: 100%; /* Drawer 너비를 넘지 않음 */
+  height: auto;
+  max-height: 60vh; /* 화면 높이의 60%를 넘지 않음 */
   background: #000;
-  margin: 20px 0;
   border-radius: 8px;
   overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
 }
+
+.preview-video,
 .preview-img {
+  display: block;
+  max-width: 100%;
+  max-height: 60vh; /* 박스와 동일하게 높이 제한 */
+  object-fit: contain; /* 비율 유지 */
+}
+
+/* 텍스트 정보 스타일 */
+.info-group {
+  text-align: left;
   width: 100%;
-  height: 100%;
-  object-fit: contain;
+}
+
+.taken-date {
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.address {
+  color: #00ebf0; /* 스위치 포인트 컬러 */
+  margin-bottom: 15px;
+}
+
+.info-list p {
+  font-size: 0.9rem;
+  color: #aaa;
 }
 
 .back-btn {
