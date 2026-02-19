@@ -4,7 +4,7 @@ const categories = [
   { name: "Jetbrains", icon: "icon-jetbrains.svg" },
   { name: "Intellij", icon: "icon-intellij.svg" },
   { name: "DataGrip", icon: "icon-datagrip.svg" },
-  { name: "PhpStorm", icon: "icon-phpstorm.svg" },
+  { name: "PhpStorm", icon: "icon-phpStorm.svg" },
   { name: "VScode", icon: "icon-vscode.svg" },
   { name: "DBeaver", icon: "icon-dbeaver.svg" },
   { name: "Eclipse", icon: "icon-eclipse.svg" },

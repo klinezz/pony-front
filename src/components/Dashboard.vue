@@ -1,7 +1,9 @@
 <script setup>
-import { ref, computed, onMounted } from "vue";
+import { ref, computed, onMounted, watch, nextTick } from "vue";
+import { debounce } from "lodash";
 import dayjs from "dayjs";
 import Editor from "./Editor.vue";
+import axios from "axios";
 // --- [상태 관리] ---
 const now = ref(dayjs()); // 실시간 배경 및 시간 판단용
 const viewDate = ref(dayjs()); // 캘린더 화면 이동용
@@ -14,6 +16,73 @@ const API_KEY = "b1aae148b4e52fb45400af617d7faeb8";
 const CITY = "Seoul";
 const API_URL = `https://api.openweathermap.org/data/2.5/weather?q=${CITY}&appid=${API_KEY}&units=metric&lang=kr`;
 
+const selectedDate = ref(dayjs().format("YYYY-MM-DD"));
+const myEditor = ref(null);
+const noteContent = ref("");
+
+const autoSaveSchedule = debounce(async () => {
+  if (!myEditor.value || !myEditor.value.editor) return;
+
+  const content = myEditor.value.editor.getHTML();
+
+  // 빈 내용일 때 불필요한 저장을 방지하려면 체크 로직 추가
+  if (content === "<p></p>" || content === "") return;
+
+  try {
+    await axios.post("/api/schedule/addScheduleItem", {
+      scheduleDate: selectedDate.value,
+      content: content,
+    });
+    console.log("자동 저장 완료:", dayjs().format("HH:mm:ss"));
+  } catch (error) {
+    console.error("자동 저장 실패:", error);
+  }
+}, 1000); // 1000ms = 1초
+// --- [로직: 데이터 가져오기 (Load)] ---
+const fetchSchedule = async (date) => {
+  if (!myEditor.value || !myEditor.value.editor) {
+    await nextTick();
+  }
+  try {
+    const response = await axios.get("/api/schedule/getScheduleItem", {
+      params: {
+        scheduleDate: date, // 자동으로 ?scheduleDate=yyyy-mm-dd 형식으로 변환됨
+      },
+    });
+    const header = `<h2>${date}</h2>`; // 상단에 붙일 제목 양식
+    let combinedContent = header + response.data.content;
+    if (response.status === 200 && response.data) {
+      myEditor.value.editor.commands.setContent(response.data.content);
+    } else {
+      myEditor.value.editor.commands.setContent();
+    }
+  } catch (error) {
+    console.error("데이터 로드 실패:", error);
+  }
+};
+watch(selectedDate, (newDate) => {
+  fetchSchedule(newDate);
+});
+// --- [로직: 데이터 저장 (Save)] ---
+const saveSchedule = async () => {
+  const content = myEditor.value.editor.getHTML(); // 에디터 HTML 내용 가져오기
+  try {
+    await axios.post("/api/schedule/addScheduleItem", {
+      scheduleDate: selectedDate.value,
+      content: content,
+    });
+    alert("저장되었습니다.");
+  } catch (error) {
+    alert("저장 실패");
+  }
+};
+
+// 날짜 클릭 이벤트
+const selectDate = (day) => {
+  if (!day) return;
+  const dateStr = viewDate.value.date(day).format("YYYY-MM-DD");
+  selectedDate.value = dateStr;
+};
 // --- [로직: 배경 클래스 생성] ---
 const timePeriod = computed(() => {
   const hour = now.value.hour();
@@ -71,10 +140,16 @@ const moveMonth = (amt) => (viewDate.value = viewDate.value.add(amt, "month"));
 const moveYear = (amt) => (viewDate.value = viewDate.value.add(amt, "year"));
 const goToday = () => {
   viewDate.value = dayjs();
+
+  selectedDate.value = viewDate.value.format("YYYY-MM-DD");
+
+  fetchSchedule(selectedDate.value);
 };
 
-onMounted(() => {
+onMounted(async () => {
   fetchWeather();
+  await nextTick();
+  fetchSchedule(selectedDate.value);
   setInterval(() => {
     now.value = dayjs();
   }, 60000); // 1분마다 시간 동기화
@@ -126,19 +201,28 @@ onMounted(() => {
 
       <main class="calendar-content">
         <div class="weekdays-row">
-          <span v-for="label in daysOfWeek" :key="label">{{ label }}</span>
+          <span
+            v-for="(label, index) in daysOfWeek"
+            :key="label"
+            :class="{ 'is-sunday': index === 0 }"
+            >{{ label }}
+          </span>
         </div>
         <div class="days-grid">
           <div
-            v-for="item in calendarDays"
+            v-for="(item, index) in calendarDays"
             :key="item.key"
             class="day-cell"
             :class="{
               'is-today':
                 item.day === dayjs().date() &&
                 viewDate.isSame(dayjs(), 'month'),
+              'is-selected':
+                selectedDate === viewDate.date(item.day).format('YYYY-MM-DD'),
               'is-empty': !item.day,
+              'is-sunday': index % 7 === 0,
             }"
+            @click="selectDate(item.day)"
           >
             {{ item.day }}
           </div>
@@ -148,7 +232,12 @@ onMounted(() => {
 
     <div id="schedule_container">
       <div class="editor">
-        <Editor ref="myEditor" />
+        <Editor
+          ref="myEditor"
+          @update="autoSaveSchedule"
+          :placeholder-text="`${selectedDate}`"
+        />
+        <!-- <button @click="saveSchedule" class="btn-save">스케줄 저장</button> -->
       </div>
 
       <div class="schedule_list">
@@ -161,17 +250,6 @@ onMounted(() => {
             <div class="schedule_desc_item">
               <i class="pi pi-ticket"></i>asdfasdfasdfasdf
             </div>
-            <div class="schedule_desc_item">asdfasdfasdfasdf</div>
-            <div class="schedule_desc_item">asdfasdfasdfasdf</div>
-          </div>
-        </div>
-        <div class="schedule_item">
-          <div class="schedule_title">
-            <i class="pi pi-calendar pr-1"></i>
-            schedule_title
-          </div>
-          <div class="schedule_desc">
-            <div class="schedule_desc_item">asdfasdfasdfasdf</div>
             <div class="schedule_desc_item">asdfasdfasdfasdf</div>
             <div class="schedule_desc_item">asdfasdfasdfasdf</div>
           </div>
@@ -194,8 +272,9 @@ onMounted(() => {
 }
 .editor {
   background-color: #ffffff;
-  padding: 20px;
+  padding: 10px;
   margin-bottom: 10px;
+  border-radius: 10px;
 }
 .schedule_list {
   display: flex;
@@ -401,6 +480,7 @@ button.btn-today {
   font-size: 10px;
   right: 13px;
   bottom: 10px;
+  color: #ffffff;
 }
 /* 7번째 날(토요일)마다 오른쪽 테두리 제거 */
 .day-cell:nth-child(n) {
@@ -410,20 +490,27 @@ button.btn-today {
 .day-cell:last-child {
   border-right: 1px solid #eee;
 }
-.day-cell:hover:not(.is-empty) {
+.day-cell:hover:not(.is-empty, .is-sunday) {
   background: #f5f5f5;
   color: #000;
 }
 
 .day-cell:hover:not(.is-empty) {
   background: #f9f9f9;
-  color: #000;
 }
-
+.is-sunday {
+  color: red;
+}
 .is-today {
   color: #5797f1 !important;
   font-weight: bold;
   box-shadow: inset 0 0 0 1px #4872f4;
+}
+
+.day-cell.is-selected {
+  background-color: #3b82f6 !important;
+  color: white !important;
+  font-weight: bold;
 }
 
 .is-empty {

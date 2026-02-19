@@ -1,151 +1,6 @@
 <template>
   <div v-if="editor" class="container">
-    <div class="control-group">
-      <div class="button-group">
-        <button
-          @click="editor.chain().focus().toggleHeading({ level: 1 }).run()"
-          :class="{ 'is-active': editor.isActive('heading', { level: 1 }) }"
-        >
-          H1
-        </button>
-        <button
-          @click="editor.chain().focus().toggleHeading({ level: 2 }).run()"
-          :class="{ 'is-active': editor.isActive('heading', { level: 2 }) }"
-        >
-          H2
-        </button>
-        <button
-          @click="editor.chain().focus().toggleHeading({ level: 3 }).run()"
-          :class="{ 'is-active': editor.isActive('heading', { level: 3 }) }"
-        >
-          H3
-        </button>
-        <button
-          @click="editor.chain().focus().toggleCodeBlock().run()"
-          :class="{ 'is-active': editor.isActive('codeBlock') }"
-        >
-          Toggle code block
-        </button>
-        <button
-          @click="editor.chain().focus().setCodeBlock().run()"
-          :disabled="editor.isActive('codeBlock')"
-        >
-          Set code block
-        </button>
-        <button
-          @click="editor.chain().focus().setDetails().run()"
-          :disabled="!editor.can().setDetails()"
-        >
-          Set details
-        </button>
-        <button
-          @click="editor.chain().focus().unsetDetails().run()"
-          :disabled="!editor.can().unsetDetails()"
-        >
-          Unset details
-        </button>
-        <button
-          @click="editor.chain().focus().toggleBulletList().run()"
-          :class="{ 'is-active': editor.isActive('bulletList') }"
-        >
-          Toggle bullet list
-        </button>
-        <button
-          @click="editor.chain().focus().toggleOrderedList().run()"
-          :class="{ 'is-active': editor.isActive('orderedList') }"
-        >
-          Toggle ordered list
-        </button>
-        <button
-          @click="editor.chain().focus().splitListItem('listItem').run()"
-          :disabled="!editor.can().splitListItem('listItem')"
-        >
-          Split list item
-        </button>
-        <button
-          @click="editor.chain().focus().sinkListItem('listItem').run()"
-          :disabled="!editor.can().sinkListItem('listItem')"
-        >
-          Sink list item
-        </button>
-        <button
-          @click="editor.chain().focus().liftListItem('listItem').run()"
-          :disabled="!editor.can().liftListItem('listItem')"
-        >
-          Lift list item
-        </button>
-
-        <div class="button-group">
-          <button
-            @click="
-              editor
-                .chain()
-                .focus()
-                .insertTable({ rows: 3, cols: 3, withHeaderRow: true })
-                .run()
-            "
-          >
-            Insert table
-          </button>
-          <button @click="editor.chain().focus().addColumnBefore().run()">
-            Add column before
-          </button>
-          <button @click="editor.chain().focus().addColumnAfter().run()">
-            Add column after
-          </button>
-          <button @click="editor.chain().focus().deleteColumn().run()">
-            Delete column
-          </button>
-          <button @click="editor.chain().focus().addRowBefore().run()">
-            Add row before
-          </button>
-          <button @click="editor.chain().focus().addRowAfter().run()">
-            Add row after
-          </button>
-          <button @click="editor.chain().focus().deleteRow().run()">
-            Delete row
-          </button>
-          <button @click="editor.chain().focus().deleteTable().run()">
-            Delete table
-          </button>
-          <button @click="editor.chain().focus().mergeCells().run()">
-            Merge cells
-          </button>
-          <button @click="editor.chain().focus().splitCell().run()">
-            Split cell
-          </button>
-          <button @click="editor.chain().focus().toggleHeaderColumn().run()">
-            Toggle header column
-          </button>
-          <button @click="editor.chain().focus().toggleHeaderRow().run()">
-            Toggle header row
-          </button>
-          <button @click="editor.chain().focus().toggleHeaderCell().run()">
-            Toggle header cell
-          </button>
-          <button @click="editor.chain().focus().mergeOrSplit().run()">
-            Merge or split
-          </button>
-          <button
-            @click="editor.chain().focus().setCellAttribute('colspan', 2).run()"
-          >
-            Set cell attribute
-          </button>
-          <button @click="editor.chain().focus().fixTables().run()">
-            Fix tables
-          </button>
-          <button @click="editor.chain().focus().goToNextCell().run()">
-            Go to next cell
-          </button>
-          <button @click="editor.chain().focus().goToPreviousCell().run()">
-            Go to previous cell
-          </button>
-        </div>
-        <div class="button-group">
-          <button @click="addImage">Set image</button>
-        </div>
-      </div>
-    </div>
+    <EditorToolbar :editor="editor" :add-image="addImage" />
     <editor-content :editor="editor" />
   </div>
 </template>
@@ -153,43 +8,62 @@
 <script setup>
 import { useEditor, EditorContent } from "@tiptap/vue-3";
 import StarterKit from "@tiptap/starter-kit";
-import Strike from "@tiptap/extension-strike";
-import { Editor } from "@tiptap/core";
-import Document from "@tiptap/extension-document";
-import Paragraph from "@tiptap/extension-paragraph";
-import Text from "@tiptap/extension-text";
-import Heading from "@tiptap/extension-heading";
-import Bold from "@tiptap/extension-bold";
-import CodeBlock from "@tiptap/extension-code-block";
 import CodeBlockLowlight from "@tiptap/extension-code-block-lowlight";
 import { TableKit } from "@tiptap/extension-table";
+import TextAlign from "@tiptap/extension-text-align";
 import { Placeholder } from "@tiptap/extensions";
+import Image from "@tiptap/extension-image";
 import {
   Details,
   DetailsContent,
   DetailsSummary,
 } from "@tiptap/extension-details";
-import { BulletList, ListItem, OrderedList } from "@tiptap/extension-list";
-import { lowlight } from "lowlight/lib/core";
+
+// Lowlight 설정
 import css from "highlight.js/lib/languages/css";
-import Image from "@tiptap/extension-image";
 import js from "highlight.js/lib/languages/javascript";
 import ts from "highlight.js/lib/languages/typescript";
 import html from "highlight.js/lib/languages/xml";
-const addImage = () => {
-  let url = window.prompt("URL");
+import Highlight from "@tiptap/extension-highlight";
+import EditorToolbar from "./EditorToolbar.vue";
+import { Color, TextStyle } from "@tiptap/extension-text-style";
+import { lowlight } from "lowlight/lib/core";
+import { watch } from "vue";
 
-  if (url) {
-    this.editor.chain().focus().setImage({ src: url }).run();
+const emit = defineEmits(["update"]);
+const props = defineProps({
+  placeholderText: {
+    type: String,
+    default: "일정을 입력하세요...",
+  },
+});
+
+// 이미지 추가 함수 (ref인 editor에 접근하기 위해 .value 사용)
+const addImage = () => {
+  const url = window.prompt("URL");
+  if (url && editor.value) {
+    editor.value.chain().focus().setImage({ src: url }).run();
   }
 };
+
 const editor = useEditor({
   autofocus: true,
   editable: true,
   injectCSS: false,
+  onUpdate({ editor }) {
+    emit("update", editor.getHTML());
+  },
   extensions: [
-    StarterKit,
-    Strike,
+    StarterKit.configure({
+      heading: { levels: [1, 2, 3] },
+      codeBlock: false,
+    }),
+    Highlight.configure({
+      multicolor: true,
+    }),
+    TextAlign.configure({
+      types: ["heading", "paragraph"],
+    }),
     TableKit.configure({
       table: { resizable: true },
     }),
@@ -197,45 +71,42 @@ const editor = useEditor({
       inline: true,
     }),
     CodeBlockLowlight.configure({
-      HTMLAttributes: {
-        class: "my-custom-class",
-      },
-      enableTabIndentation: true,
-      languageClassPrefix: "language-",
-      defaultLanguage: "plaintext",
       lowlight,
+      HTMLAttributes: { class: "code-block" },
     }),
     Details.configure({
       persist: true,
-      HTMLAttributes: {
-        class: "details",
-      },
+      HTMLAttributes: { class: "details" },
     }),
+    TextStyle,
+    Color,
     DetailsSummary,
     DetailsContent,
-    ListItem,
-    Heading.configure({
-      levels: [1, 2, 3],
-    }),
     Placeholder.configure({
-      includeChildren: true,
       placeholder: ({ node }) => {
-        if (node.type.name === "detailsSummary") {
-          return "Summary";
-        }
-
-        return null;
+        return props.placeholderText;
       },
     }),
   ],
+  content: "",
+});
 
-  content: `
-        <h1>This is a 1st level heading</h1>
-        <h2>This is a 2nd level heading</h2>
-        <h3>This is a 3rd level heading</h3>
-        <h4>This 4th level heading will be converted to a paragraph, because levels are configured to be only 1, 2 or 3.</h4>
+watch(
+  () => props.placeholderText,
+  (newText) => {
+    if (editor.value) {
+      editor.value.extensionManager.extensions.find(
+        (ext) => ext.name === "placeholder",
+      ).options.placeholder = newText;
 
-      `,
+      // 에디터 상태를 강제로 재렌더링하여 반영
+      editor.value.view.dispatch(editor.value.state.tr);
+    }
+  },
+);
+
+defineExpose({
+  editor,
 });
 </script>
 <style scoped>
@@ -322,7 +193,7 @@ const editor = useEditor({
   margin: 0;
   overflow: hidden;
   table-layout: fixed;
-  width: 100%;
+  width: 80%;
 }
 
 :deep(.tiptap) table td,
@@ -341,7 +212,7 @@ const editor = useEditor({
 }
 
 :deep(.tiptap) table th {
-  background-color: #616161;
+  background-color: #eeeeee;
   font-weight: bold;
   text-align: left;
 }
@@ -473,5 +344,36 @@ const editor = useEditor({
 }
 :deep(.tiptap) img.ProseMirror-selectednode {
   outline: 3px solid var(--purple);
+}
+:deep(.tiptap) {
+  outline: none !important;
+  border: none !important;
+  min-height: 300px;
+  border-radius: 5px;
+  margin-top: 20px;
+}
+
+/* 추가로, 특정 브라우저에서 생길 수 있는 그림자 효과도 제거하고 싶을 때 */
+:deep(.tiptap:focus) {
+  box-shadow: none !important;
+}
+:deep(.tiptap) mark {
+  border-radius: 2px;
+  padding: 0 2px;
+}
+
+/* 특정 색상이 지정된 경우 */
+:deep(.tiptap) mark[data-color] {
+  background-color: var(
+    --highlight-color
+  ); /* Tiptap이 자동으로 인라인 스타일을 부여함 */
+}
+
+:deep(p.is-editor-empty:first-child::before) {
+  color: var(--gray-4);
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  pointer-events: none;
 }
 </style>

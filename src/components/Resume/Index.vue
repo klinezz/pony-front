@@ -10,7 +10,7 @@ const router = useRouter();
 const menuItems = computed(() => {
   // matched 배열에서 현재 섹션의 부모 라우트를 찾습니다.
   // path가 '/history'를 포함하는 노드를 찾아 그 자식들을 가져옵니다.
-  const parentRoute = route.matched.find((m) => m.path.includes("/history"));
+  const parentRoute = route.matched.find((m) => m.path.includes("/resume"));
 
   if (!parentRoute || !parentRoute.children) return [];
 
@@ -19,7 +19,7 @@ const menuItems = computed(() => {
     .map((child) => ({
       label: child.meta?.label || child.name,
       icon: child.meta?.icon || "pi pi-circle-fill", // 라우터에 설정된 아이콘 사용
-      route: `/history/${child.path}`, // 부모 경로와 결합
+      route: `/resume/${child.path}`, // 부모 경로와 결합
     }));
 });
 </script>

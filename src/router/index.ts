@@ -13,12 +13,13 @@ import UserManageView from "@/components/User/UserManage.vue";
 import UserRoleView from "@/components/User/UserRole.vue";
 import UserLogView from "@/components/User/UserLog.vue";
 
-import HistoryIndex from "@/components/History/HistoryIndex.vue";
-import HistoryToolsComponent from "@/components/History/Tools.vue";
-import HistoryAbilityComponent from "@/components/History/Ability.vue";
-import HistoryAbilityDetailComponent from "@/components/History/AbilityDetail.vue";
-import HistoryCertComponent from "@/components/History/Certification.vue";
-import HistoryProjectComponent from "@/components/History/Project.vue";
+import ResumeIndex from "@/components/Resume/Index.vue";
+import ResumeAboutComponent from "@/components/Resume/About.vue";
+import ResumeToolsComponent from "@/components/Resume/Tools.vue";
+import ResumeAbilityComponent from "@/components/Resume/Ability.vue";
+import ResumeAbilityDetailComponent from "@/components/Resume/AbilityDetail.vue";
+import ResumeCertComponent from "@/components/Resume/Certification.vue";
+import ResumeProjectComponent from "@/components/Resume/Project.vue";
 
 import NasIndex from "@/components/NAS/NasIndex.vue";
 import NasImageComponent from "@/components/NAS/MENU_IMAGE/Image.vue";
@@ -127,28 +128,36 @@ const router = createRouter({
           ],
         },
         {
-          path: "history",
-          meta: { label: "History", isMenu: true, icon: "/icon-record.png" },
-          redirect: "/history/ability",
+          path: "resume",
+          meta: { label: "Resume", isMenu: true, icon: "/icon-record.png" },
+          redirect: "/resume/about",
           children: [
             {
-              path: "ability",
-              meta: { label: "Ability", icon: "pi pi-id-card" },
+              path: "about",
+              meta: { label: "About", icon: "pi pi-exclamation-circle" },
+              components: {
+                default: ResumeIndex,
+                detail: ResumeAboutComponent,
+              },
+            },
+            {
+              path: "skill",
+              meta: { label: "Skill", icon: "pi pi-id-card" },
               children: [
                 {
                   path: "",
-                  name: "Ability",
+                  name: "Skill",
                   components: {
-                    default: HistoryIndex,
-                    detail: HistoryAbilityComponent,
+                    default: ResumeIndex,
+                    detail: ResumeAbilityComponent,
                   },
                 },
                 {
                   path: ":skillName",
                   name: "AbilityDetail",
                   components: {
-                    default: HistoryIndex,
-                    detail: HistoryAbilityDetailComponent,
+                    default: ResumeIndex,
+                    detail: ResumeAbilityDetailComponent,
                   },
                   meta: { label: ":skillName" },
                 },
@@ -159,8 +168,8 @@ const router = createRouter({
               name: "Project",
               meta: { label: "Project", icon: "pi pi-objects-column" },
               components: {
-                default: HistoryIndex,
-                detail: HistoryProjectComponent,
+                default: ResumeIndex,
+                detail: ResumeProjectComponent,
               },
             },
             {
@@ -168,16 +177,16 @@ const router = createRouter({
               name: "Certification",
               meta: { label: "Certification", icon: "pi pi-receipt" },
               components: {
-                default: HistoryIndex,
-                detail: HistoryCertComponent,
+                default: ResumeIndex,
+                detail: ResumeCertComponent,
               },
             },
             {
               path: "tools",
               meta: { label: "Tools", icon: "pi pi-receipt" },
               components: {
-                default: HistoryIndex,
-                detail: HistoryToolsComponent,
+                default: ResumeIndex,
+                detail: ResumeToolsComponent,
               },
             },
           ],
