@@ -404,7 +404,6 @@ x
   padding: 20px;
   border-radius: 12px;
   border: 1px solid #e2e8f0;
-  min-height: 500px;
 }
 
 .post_title {
@@ -427,6 +426,7 @@ x
   box-sizing: content-box;
   margin-top: 20px;
   line-height: 1.6;
+  padding: 10px;
 }
 
 @keyframes fadeIn {
