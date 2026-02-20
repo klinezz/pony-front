@@ -16,7 +16,8 @@ export default defineConfig(({ mode }) => {
       },
     },
     build: {
-      outDir: "../backend/src/main/resources/static",
+      //outDir: "../pony/src/main/resources/static",
+      outDir: "dist",
       emptyOutDir: true,
       assetsDir: "assets",
     },
