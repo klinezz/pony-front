@@ -1,14 +1,36 @@
 import { defineConfig, loadEnv } from "vite";
+import { fileURLToPath, URL } from "node:url";
 import vue from "@vitejs/plugin-vue";
 import tailwindcss from "@tailwindcss/vite";
-import { fileURLToPath, URL } from "node:url";
+import monacoEditorPlugin from "vite-plugin-monaco-editor";
 
 export default defineConfig(({ mode }) => {
   // 현재 모드(development/production)에 맞는 환경 변수를 불러옵니다.
   const env = loadEnv(mode, process.cwd());
 
   return {
-    plugins: [vue(), tailwindcss()],
+    plugins: [
+      vue(),
+      tailwindcss(),
+      (typeof monacoEditorPlugin === "function"
+        ? monacoEditorPlugin
+        : (monacoEditorPlugin as any).default)({
+        languageWorkers: [
+          "editorWorkerService",
+          "typescript",
+          "css",
+          "html",
+          "json",
+        ],
+      }),
+    ],
+    optimizeDeps: {
+      include: [
+        "monaco-languageclient",
+        "vscode-ws-jsonrpc",
+        "vscode-languageserver-protocol",
+      ],
+    },
     resolve: {
       alias: {
         // '@'를 현재 프로젝트의 'src' 폴더 경로로 매핑

@@ -17,9 +17,9 @@ const dynamicTransition = ref("");
 watch(
   () => route.name,
   (to, from) => {
-    if (from === "Ability" && to === "AbilityDetail") {
+    if (from === "Skill" && to === "SkillDetail") {
       dynamicTransition.value = "slide-next";
-    } else if (from === "AbilityDetail" && to === "Ability") {
+    } else if (from === "SkillDetail" && to === "Skill") {
       dynamicTransition.value = "slide-prev";
     } else {
       dynamicTransition.value = "";

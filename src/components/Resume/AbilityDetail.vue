@@ -39,7 +39,7 @@ const displayDesc = computed(
 const displayIcon = computed(() => selectedSkill.value?.icon || "이름 없음");
 const goBack = () => {
   router.push({
-    name: "Ability",
+    name: "Skill",
   });
 };
 const fetchList = async () => {

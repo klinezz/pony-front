@@ -31,7 +31,7 @@ const toggleCategory = (categoryId) => {
 
 const goToBoard = (categoryId, item) => {
   router.push({
-    name: "AbilityDetail",
+    name: "SkillDetail",
     params: {
       skillName: item.name,
       categoryId: categoryId,

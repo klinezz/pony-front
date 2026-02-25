@@ -2,8 +2,10 @@ import { createRouter, createWebHistory } from "vue-router";
 import { useAuthStore } from "@/store/auth";
 import HomePage from "@/components/HomePage.vue";
 import LoginPage from "@/components/LoginPage.vue";
+import SignUpPage from "@/components/SignUpPage.vue";
 import DashboardPage from "@/components/Dashboard.vue";
 import BoardPage from "@/components/Dashboard.vue";
+import SettingsPage from "@/components/Settings/Settings.vue";
 
 import SettingsIndex from "@/components/Settings/SettingsIndex.vue";
 import SettingsThemeComponent from "@/components/Settings/Settings.vue";
@@ -34,6 +36,12 @@ const router = createRouter({
       path: "/login",
       name: "Login",
       component: LoginPage,
+      meta: { requiresAuth: false }, // 로그인 없이 접근 가능
+    },
+    {
+      path: "/signup",
+      name: "Signup",
+      component: SignUpPage,
       meta: { requiresAuth: false }, // 로그인 없이 접근 가능
     },
     {
@@ -78,20 +86,28 @@ const router = createRouter({
           component: BoardPage,
         },
         {
-          path: "settings",
-          name: "SettingsIndex",
-          meta: { label: "설정", isMenu: true, icon: "/icon-settings.png" },
-          components: {
-            default: SettingsIndex,
-          },
-        },
-        {
           path: "Settings/theme",
           name: "SettingsTheme",
           components: {
             default: SettingsIndex, // 왼쪽 목록 유지
             detail: SettingsThemeComponent, // 오른쪽 <RouterView name="detail" />에 표시
           },
+        },
+        {
+          path: "settings",
+          meta: { label: "설정", isMenu: true, icon: "/icon-user.png" },
+          redirect: "/settings/monaco",
+          children: [
+            {
+              path: "monaco",
+              name: "monaco",
+              meta: { label: "사용자 관리", icon: "pi pi-user" },
+              components: {
+                default: SettingsIndex,
+                detail: SettingsPage,
+              },
+            },
+          ],
         },
         {
           path: "user",
@@ -154,7 +170,7 @@ const router = createRouter({
                 },
                 {
                   path: ":skillName",
-                  name: "AbilityDetail",
+                  name: "SkillDetail",
                   components: {
                     default: ResumeIndex,
                     detail: ResumeAbilityDetailComponent,

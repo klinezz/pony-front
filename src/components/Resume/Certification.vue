@@ -64,6 +64,14 @@ const toggleCategory = (id) => {
 .cert_container {
   border-radius: 16px;
 }
+.menu_title {
+  font-size: 20px;
+  font-weight: 700;
+  color: #333;
+  margin-bottom: 20px;
+  padding-left: 5px;
+  border-left: 4px solid #1264a3;
+}
 
 .cert_grid {
   display: flex;

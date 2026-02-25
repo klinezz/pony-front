@@ -11,7 +11,7 @@ const loginForm = reactive({
   password: ''
 });
 
-const message = "Hello, Vue 3!"; 
+const message = "Hello"; 
 const inputId = useTemplateRef('inputId');
 const inputPw = useTemplateRef('inputPw'); 
 const userId = ref('');
@@ -63,7 +63,7 @@ const showUserInputPassword = () => {
   <div> 
     <div id="loginBox">
       <h1>{{ message }}</h1>  
-      <form id="loginForm"  @submit.prevent="doLogin" style="margin-top:50px;">
+      <form id="loginForm"  @submit.prevent="doLogin" style="margin-top:20px;">
         <div class="loginInput">
           <div class="loginCol">
             <div>아이디</div>
@@ -83,26 +83,26 @@ const showUserInputPassword = () => {
         </div>
         
         <div class="divLoginButton">
-        <button type="submit">로그인</button>
-        <svg class="border-svg">
-                <defs>
-                  <linearGradient id="glow-grad" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stop-color="#3b82f6" stop-opacity="0.2" />
-                    <stop offset="50%" stop-color="#60a5fa" stop-opacity="0.6" />
-                    <stop offset="100%" stop-color="#3b82f6" stop-opacity="1" />
-                  </linearGradient>
-                </defs>
-                <rect
-                  class="border-rect"
-                  x="-2"
-                  y="2"
-                  width="calc(100% + 4px)"
-                  height="calc(100% - 4px)"
-                  rx="12"
-                  ry="12"
-                ></rect>
-              </svg>
-</div>
+          <button type="submit">로그인</button>
+          <svg class="border-svg">
+            <defs>
+                <linearGradient id="glow-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#3b82f6" stop-opacity="0.2" />
+                  <stop offset="50%" stop-color="#60a5fa" stop-opacity="0.6" />
+                  <stop offset="100%" stop-color="#3b82f6" stop-opacity="1" />
+                </linearGradient>
+            </defs>
+            <rect
+              class="border-rect"
+              x="-2"
+              y="2"
+              width="calc(100% + 4px)"
+              height="calc(100% - 4px)"
+              rx="12"
+              ry="12"
+            ></rect>
+          </svg>
+        </div>
         <div class="loginCheck">
           <label for="checkId">
               <input type="checkbox" v-model="saveId" id="checkId">ID 저장하기
@@ -129,7 +129,7 @@ body{
     font-family: 'Noto Sans KR', sans-serif !important;
 } 
 #loginBox{ 
-  padding: 100px 120px;
+  padding: 60px 110px;
   border : 1px solid #e1e1e1;
   box-sizing: border-box;
   border-radius: 30px;
@@ -165,6 +165,9 @@ body{
   align-items: center;
   width: 250px; 
 }  
+#loginForm > .loginInput > .loginCol > .divLoginCol input{ 
+  padding-left: 10px;
+}
 #loginForm > .loginInput > .loginCol > .divLoginCol img { 
   width: 20px;
   height: 20px;

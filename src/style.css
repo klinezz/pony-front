@@ -32,6 +32,10 @@
   --shadow:
     0px 12px 33px 0px rgba(0, 0, 0, 0.06),
     0px 3.618px 9.949px 0px rgba(0, 0, 0, 0.04);
+  --iron-base: #2d3748;
+  --iron-front: #4a5568;
+  --iron-dark: #1a202c;
+  --paper-white: #ffffff;
 }
 * {
   margin: 0;
@@ -77,7 +81,6 @@ button:focus-visible {
   max-height: 100vh;
   margin: 0 auto;
   text-align: center;
-  background: #eeeeee;
 }
 input:focus {
   outline: none;
