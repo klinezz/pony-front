@@ -41,8 +41,7 @@ const doLogin = async () => {
     await authStore.login(formData);  
     router.push('/');
   } catch (error) { 
-    alert('로그인 정보가 올바르지 않습니다.');
-    console.error(error);
+    alert(error); 
   }
 } 
 const findUserIdAndPassword = () => {

@@ -14,13 +14,20 @@ export const useAuthStore = defineStore("auth", {
         if (res.status === 200) {
           this.isLoggedIn = true;
           localStorage.setItem("is_authenticated", "true");
-          this.user = res.data; // 서버에서 보내준 유저 정보 저장
-
-          return res.data; // 성공 반환
+          this.user = res.data;
+          return res.data;
         }
-      } catch (error) {
+      } catch (error: any) {
+        console.log(error);
         this.isLoggedIn = false;
-        throw error; // 에러를 던져야 컴포넌트의 catch가 작동함
+        localStorage.removeItem("is_authenticated"); // 실패 시 기존 정보 삭제
+
+        // 백엔드에서 보낸 에러 메시지가 있다면 에러 객체에 담아서 던짐
+        if (error.response && error.response.data) {
+          // error.response.data.message (백엔드 필터에서 보낸 JSON 내용)
+          throw error.response.data.message || "로그인에 실패했습니다.";
+        }
+        throw error;
       }
     },
     async logout() {

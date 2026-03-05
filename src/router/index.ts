@@ -27,6 +27,12 @@ import NasIndex from "@/components/NAS/NasIndex.vue";
 import NasImageComponent from "@/components/NAS/MENU_IMAGE/Image.vue";
 import NasVideoComponent from "@/components/NAS/MENU_IMAGE/Video.vue";
 import NasDocComponent from "@/components/NAS/MENU_IMAGE/Doc.vue";
+
+import ManagerIndex from "@/components/Manager/Index.vue";
+import ManagerCompany from "@/components/Manager/Company.vue";
+import ManagerProject from "@/components/Manager/Project.vue";
+import ManagerCertification from "@/components/Manager/Certification.vue";
+
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   linkActiveClass: "active-menu-item",
@@ -95,7 +101,7 @@ const router = createRouter({
         },
         {
           path: "settings",
-          meta: { label: "설정", isMenu: true, icon: "/icon-user.png" },
+          meta: { label: "설정", isMenu: true, icon: "/icon-settings.png" },
           redirect: "/settings/monaco",
           children: [
             {
@@ -203,6 +209,46 @@ const router = createRouter({
               components: {
                 default: ResumeIndex,
                 detail: ResumeToolsComponent,
+              },
+            },
+          ],
+        },
+        {
+          path: "manager",
+          meta: { label: "Manager", isMenu: true, icon: "/icon-admin.png" },
+          redirect: "/manager/project",
+          children: [
+            {
+              path: "company",
+              meta: {
+                label: "소속회사 관리",
+                icon: "pi pi-building",
+              },
+              components: {
+                default: ManagerIndex,
+                detail: ManagerCompany,
+              },
+            },
+            {
+              path: "project",
+              meta: {
+                label: "프로젝트 관리",
+                icon: "pi pi-th-large",
+              },
+              components: {
+                default: ManagerIndex,
+                detail: ManagerProject,
+              },
+            },
+            {
+              path: "certification",
+              meta: {
+                label: "자격증 관리",
+                icon: "pi pi-receipt",
+              },
+              components: {
+                default: ManagerIndex,
+                detail: ManagerCertification,
               },
             },
           ],
