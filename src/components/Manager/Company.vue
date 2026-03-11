@@ -13,7 +13,6 @@ const isEditing = ref(false);
 const currentCompany = ref({
   idx: null,
   companyName: "",
-  workPeriod: "",
   hireDate: null,
   resignation_date: null,
 });
@@ -39,8 +38,8 @@ const formatDate = (date) => {
 
 // 2. 저장 및 수정 (Create & Update)
 const saveCompany = async () => {
-  if (!currentCompany.value.companyName || !currentCompany.value.workPeriod) {
-    return alert("회사명과 근무기간은 필수입니다.");
+  if (!currentCompany.value.companyName || !currentCompany.value.hireDate) {
+    return alert("회사명과 입사일 필수입니다.");
   }
 
   const payload = { ...currentCompany.value };
@@ -124,20 +123,11 @@ const resetForm = () => {
 
       <div class="form-scroll-area">
         <div class="field">
-          <label>회사명 (Not Null)</label>
+          <label>회사명</label>
           <InputText
             v-model="currentCompany.companyName"
             class="w-full"
-            placeholder="예: 미래에셋생명"
-          />
-        </div>
-
-        <div class="field">
-          <label>근무기간 (Not Null)</label>
-          <InputText
-            v-model="currentCompany.workPeriod"
-            class="w-full"
-            placeholder="예: 2023.05 - 2023.11"
+            placeholder="근무회사"
           />
         </div>
 
@@ -193,11 +183,7 @@ const resetForm = () => {
           size="small"
         >
           <Column field="companyName" header="회사명" sortable></Column>
-          <Column
-            field="workPeriod"
-            header="근무기간"
-            style="width: 200px"
-          ></Column>
+
           <Column header="입사/퇴사일" style="width: 250px">
             <template #body="slotProps">
               <span class="text-sm">
@@ -235,8 +221,7 @@ const resetForm = () => {
 <style scoped>
 .admin-layout {
   display: flex;
-  height: 100vh;
-  background-color: #f8fafc;
+  gap: 20px;
   overflow: hidden;
 }
 .header-section {
@@ -286,7 +271,6 @@ const resetForm = () => {
 }
 .main-content {
   flex: 1;
-  padding: 2.5rem;
   overflow-y: auto;
 }
 .title {

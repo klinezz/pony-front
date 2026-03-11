@@ -82,7 +82,7 @@ const placeholder = ref("상세내용");
 </script>
 
 <template>
-  <div class="detail_container">
+  <div>
     <div class="header-section">
       <h2 class="title">Certification Portfolio Management</h2>
       <p class="subtitle">자격증 이력을 관리합니다.</p>

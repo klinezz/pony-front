@@ -216,7 +216,7 @@ const router = createRouter({
         {
           path: "manager",
           meta: { label: "Manager", isMenu: true, icon: "/icon-admin.png" },
-          redirect: "/manager/project",
+          redirect: "/manager/company",
           children: [
             {
               path: "company",

@@ -130,7 +130,7 @@ const placeholder = ref("상세내용");
 </script>
 
 <template>
-  <div class="detail_container">
+  <div>
     <div class="header-section">
       <h2 class="title">Project Portfolio Management</h2>
       <p class="subtitle">프로젝트 이력을 관리합니다.</p>
@@ -374,7 +374,9 @@ const placeholder = ref("상세내용");
   border-radius: 10px;
   overflow: hidden;
 }
-
+.p-datepicker-dropdown {
+  border-radius: 0px !important;
+}
 /* 공통 클래스 */
 .w-full {
   width: 100%;
