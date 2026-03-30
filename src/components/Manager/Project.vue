@@ -85,17 +85,21 @@ const saveProject = async () => {
 
   try {
     if (isEditing.value) {
-      // 수정
-      await axios.put(`/api/manager/updateProject/${payload.idx}`, payload);
+      await axios.put("/api/manager/editProject", payload, {
+        params: {
+          idx: payload.idx,
+        },
+      });
       alert("수정되었습니다.");
     } else {
       // 신규 등록
       await axios.post("/api/manager/createProject", payload);
       alert("등록되었습니다.");
     }
-    await fetchProjects(); // 목록 새로고침
+    await fetchProjects();
     resetForm();
   } catch (error) {
+    console.error(error);
     alert("서버 통신 중 오류가 발생했습니다.");
   }
 };

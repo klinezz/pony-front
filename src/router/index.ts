@@ -54,7 +54,7 @@ const router = createRouter({
     {
       path: "/",
       component: HomePage,
-      meta: { requiresAuth: false, label: "HOME" }, // 로그인 필요
+      meta: { requiresAuth: true, label: "HOME" }, // 로그인 필요
       children: [
         {
           path: "/", // 빈 경로는 기본 대시보드로 이동

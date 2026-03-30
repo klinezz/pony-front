@@ -88,13 +88,13 @@ const goToBoard = (categoryId, item) => {
               <div class="item_name">
                 <span class="bullet">•</span>
                 <img
-                  :src="`/skill/${item.icon}`"
+                  :src="item.imageUrl ? item.imageUrl : `/skill/${item.icon}`"
                   :alt="item.name"
                   style="width: 20px"
                 />
                 {{ item.name }}
               </div>
-              <div class="item_desc">{{ item.desc }}</div>
+              <div class="item_desc">{{ item.description }}</div>
             </div>
           </div>
         </div>
