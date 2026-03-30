@@ -1,39 +1,38 @@
 <script setup>
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
+import axios from "axios";
 
-const certifications = [
-  {
-    name: "정보처리기사",
-    date: "2023.06.23",
-    organizer: "한국산업인력공단 ",
-  },
-  {
-    name: "SQL 개발자 (SQLD)",
-    date: "2023.09.15",
-    organizer: "한국데이터산업진흥원",
-  },
-  {
-    name: "네트워크관리사2급",
-    date: "2024.02.10",
-    organizer: "한국정보통신자격협회",
-  },
-  {
-    name: "리눅스마스터2급",
-    date: "2025.01.20",
-    organizer: "한국정보통신진흥협회",
-  },
-  {
-    name: "ADSP",
-    date: "2025.01.20",
-    organizer: "한국데이터산업진흥원 ",
-  },
-];
+// 1. 상태 관리 변수
+const certifications = ref([]); // API로 받아올 자격증 목록
+const isLoading = ref(true); // 로딩 상태 (선택 사항)
 
-const activeCategory = ref(null);
+// 2. API로 목록 가져오기 함수
+const getAllCertificates = async () => {
+  try {
+    isLoading.value = true;
+    const response = await axios.get("/api/manager/getAllCertificates");
 
-const toggleCategory = (id) => {
-  activeCategory.value = activeCategory.value === id ? null : id;
+    // 백엔드 필드(name, organization, obtainedDate)를 화면용 데이터로 매핑
+    // 만약 백엔드 필드명을 그대로 사용한다면 템플릿만 수정하면 됩니다.
+    certifications.value = response.data;
+  } catch (error) {
+    console.error("자격증 목록을 가져오는데 실패했습니다:", error);
+  } finally {
+    isLoading.value = false;
+  }
 };
+
+// 날짜 포맷팅 함수 (기존 2023-01-01 -> 2023.01.01 변환)
+const formatDate = (dateStr) => {
+  if (!dateStr) return "-";
+  const d = new Date(dateStr);
+  return d.toLocaleDateString("ko-KR");
+};
+
+// 3. 컴포넌트 마운트 시 실행
+onMounted(() => {
+  getAllCertificates();
+});
 </script>
 
 <template>
@@ -46,11 +45,11 @@ const toggleCategory = (id) => {
           <div class="cert_details">
             <p class="detail_item">
               <span class="label">발급기관</span>
-              <span class="value">{{ cert.organizer }}</span>
+              <span class="value">{{ cert.organization }}</span>
             </p>
             <p class="detail_item">
               <span class="label">취득일자</span>
-              <span class="value">{{ cert.date }}</span>
+              <span class="value">{{ cert.obtainedDate }}</span>
             </p>
           </div>
         </div>

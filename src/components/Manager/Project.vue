@@ -17,10 +17,11 @@ const myEditor = ref(null); // Editor 컴포넌트 참조
 
 const currentProject = ref({
   idx: null,
-  title: "",
-  period: null,
-  client: "",
-  desc: "",
+  projectName: "",
+  projectPeriod: null,
+  clientName: "",
+  projectDesc: "",
+  mainRole: "",
 });
 
 // 1. 회사 목록 조회 (콤보박스용)
@@ -47,28 +48,38 @@ onMounted(() => {
   fetchProjects();
 });
 const formatDate = (dateRange) => {
-  if (!dateRange || !dateRange[0]) return "-";
-  const start = dateRange[0].toLocaleDateString("ko-KR");
-  const end = dateRange[1]
-    ? dateRange[1].toLocaleDateString("ko-KR")
-    : "진행중";
-  return `${start} ~ ${end}`;
+  if (!dateRange) return "~";
+
+  if (typeof dateRange === "string") {
+    return dateRange;
+  }
+
+  if (Array.isArray(dateRange) && dateRange[0]) {
+    const start = new Date(dateRange[0]).toLocaleDateString("ko-KR");
+    const end = dateRange[1]
+      ? new Date(dateRange[1]).toLocaleDateString("ko-KR")
+      : "진행중";
+    return `${start} ~ ${end}`;
+  }
+
+  return "~";
 };
 // 2. 저장 및 수정 (Create & Update)
 const saveProject = async () => {
-  if (!currentProject.value.title) return alert("자격증명을 입력해주세요.");
+  if (!currentProject.value.projectName)
+    return alert("프로젝트명을 입력해주세요.");
 
   // 에디터의 HTML 컨텐츠 추출 (Editor 컴포넌트에 getHTML 메서드가 있다고 가정)
   const editorContent = myEditor.value.editor.getHTML() || "";
 
   const payload = {
     idx: currentProject.value.idx,
-    companyIdx: 1,
-    projectName: currentProject.value.title,
-    clientName: currentProject.value.client,
-    positionRole: currentProject.value.position,
-    mainRole: currentProject.value.role,
-    projectPeriod: formatDate(currentProject.value.period),
+    companyIdx: currentProject.value.companyIdx,
+    projectName: currentProject.value.projectName,
+    clientName: currentProject.value.clientName,
+    positionRole: currentProject.value.positionRole,
+    mainRole: currentProject.value.mainRole,
+    projectPeriod: formatDate(currentProject.value.projectPeriod),
     projectDesc: editorContent,
   };
 
@@ -104,26 +115,44 @@ const deleteProject = async (idx) => {
 
 // 수정 모드 진입
 const editProject = (data) => {
-  isEditing.value = true;
-  currentProject.value = {
-    ...data,
-    title: data.projectName, // DB 필드명과 UI 모델명 매칭
-    client: data.clientName,
-  };
+  currentProject.value = { ...data };
+
+  // 2. 문자열 "2026. 3. 9. ~ 2026. 3. 12."를 배열로 변환
+  if (typeof currentProject.value.projectPeriod === "string") {
+    const dateParts = currentProject.value.projectPeriod
+      .split("~")
+      .map((d) => d.trim());
+
+    if (dateParts.length >= 1) {
+      // 점(.)을 하이픈(-)으로 바꿔야 new Date()가 더 잘 인식합니다.
+      const start = new Date(dateParts[0].replace(/\./g, "-"));
+      const end =
+        dateParts[1] && dateParts[1] !== "진행중"
+          ? new Date(dateParts[1].replace(/\./g, "-"))
+          : null;
+
+      // DatePicker가 인식할 수 있는 [Date, Date] 배열로 교체
+      currentProject.value.projectPeriod = [start, end];
+    }
+  }
+
   // 에디터에 기존 내용 셋팅 (Editor 컴포넌트에 setHTML 메서드가 있다면)
-  myEditor.value?.setHTML(data.projectDesc);
+  myEditor.value?.editor.commands.setContent(data.projectDesc);
   window.scrollTo({ top: 0, behavior: "smooth" });
+
+  isEditing.value = true;
 };
 
 const resetForm = () => {
   currentProject.value = {
     idx: null,
-    title: "",
-    period: null,
-    client: "",
-    desc: "",
+    projectName: "",
+    projectPeriod: null,
+    clientName: "",
+    projectDesc: "",
+    mainRole: "",
   };
-  myEditor.value?.setHTML(""); // 에디터 초기화
+  myEditor.value?.editor.commands.setContent(""); // 에디터 초기화
   isEditing.value = false;
 };
 const placeholder = ref("상세내용");
@@ -162,7 +191,7 @@ const placeholder = ref("상세내용");
             <div class="field full-width">
               <label>프로젝트명</label>
               <InputText
-                v-model="currentProject.title"
+                v-model="currentProject.projectName"
                 placeholder="프로젝트 타이틀"
                 class="w-full"
               />
@@ -170,22 +199,23 @@ const placeholder = ref("상세내용");
 
             <div class="field full-width">
               <label>발주처</label>
-              <InputText v-model="currentProject.client" class="w-full" />
+              <InputText v-model="currentProject.clientName" class="w-full" />
             </div>
 
             <div class="field">
               <label>소속 및 직책</label>
-              <InputText v-model="currentProject.position" class="w-full" />
+              <InputText v-model="currentProject.positionRole" class="w-full" />
             </div>
 
             <div class="field">
               <label>수행 기간</label>
               <DatePicker
-                v-model="currentProject.period"
+                v-model="currentProject.projectPeriod"
                 selectionMode="range"
                 :manualInput="false"
                 showIcon
                 fluid
+                range
                 placeholder="시작일 - 종료일 선택"
               />
             </div>
@@ -193,7 +223,7 @@ const placeholder = ref("상세내용");
             <div class="field full-width">
               <label>담당 업무</label>
               <InputText
-                v-model="currentProject.role"
+                v-model="currentProject.mainRole"
                 class="w-full"
                 placeholder="주요 역할 및 핵심 기술 기술"
               />
@@ -213,9 +243,10 @@ const placeholder = ref("상세내용");
         <div class="form-footer">
           <Button
             v-if="isEditing"
-            label="취col-12 md:col-6소"
+            label="취소"
             icon="pi pi-times"
             severity="secondary"
+            class="col-12 md:col-6"
             text
             @click="resetForm"
           />
@@ -238,7 +269,7 @@ const placeholder = ref("상세내용");
           removableSort
         >
           <Column
-            field="title"
+            field="projectName"
             header="프로젝트명"
             sortable
             style="width: 30%"
@@ -246,13 +277,21 @@ const placeholder = ref("상세내용");
           <Column header="기간" style="width: 20%">
             <template #body="slotProps">
               <Tag
-                :value="formatDate(slotProps.data.period)"
+                :value="formatDate(slotProps.data.projectPeriod)"
                 severity="secondary"
               />
             </template>
           </Column>
-          <Column field="client" header="발주처" style="width: 15%"></Column>
-          <Column field="position" header="직책" style="width: 15%"></Column>
+          <Column
+            field="clientName"
+            header="발주처"
+            style="width: 15%"
+          ></Column>
+          <Column
+            field="positionRole"
+            header="직책"
+            style="width: 15%"
+          ></Column>
           <Column header="관리" style="width: 15%">
             <template #body="slotProps">
               <div class="flex gap-3">

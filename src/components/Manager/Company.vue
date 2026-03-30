@@ -14,7 +14,7 @@ const currentCompany = ref({
   idx: null,
   companyName: "",
   hireDate: null,
-  resignation_date: null,
+  resignationDate: null,
 });
 
 // 1. 목록 조회 (Read)
@@ -49,7 +49,7 @@ const saveCompany = async () => {
       await axios.post(`/api/manager/updateCompany/${payload.idx}`, payload);
       alert("수정되었습니다.");
     } else {
-      await axios.post("/api/manager/createCompany", payload);
+      await axios.post("/api/manager/addCompany", payload);
       alert("등록되었습니다.");
     }
     await fetchCompanies();
@@ -82,8 +82,8 @@ const editCompany = (data) => {
   currentCompany.value = {
     ...data,
     hireDate: data.hireDate ? new Date(data.hireDate) : null,
-    resignation_date: data.resignation_date
-      ? new Date(data.resignation_date)
+    resignationDate: data.resignationDate
+      ? new Date(data.resignationDate)
       : null,
   };
   window.scrollTo({ top: 0, behavior: "smooth" });
@@ -95,7 +95,7 @@ const resetForm = () => {
     companyName: "",
     workPeriod: "",
     hireDate: null,
-    resignation_date: null,
+    resignationDate: null,
   };
   isEditing.value = false;
 };
@@ -145,7 +145,7 @@ const resetForm = () => {
         <div class="field">
           <label>퇴사일</label>
           <DatePicker
-            v-model="currentCompany.resignation_date"
+            v-model="currentCompany.resignationDate"
             dateFormat="yy/mm/dd"
             showIcon
             fluid
@@ -188,7 +188,7 @@ const resetForm = () => {
             <template #body="slotProps">
               <span class="text-sm">
                 {{ formatDate(slotProps.data.hireDate) }} ~
-                {{ formatDate(slotProps.data.resignation_date) }}
+                {{ formatDate(slotProps.data.resignationDate) }}
               </span>
             </template>
           </Column>

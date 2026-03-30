@@ -1,88 +1,102 @@
 <script setup>
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
+import axios from "axios";
 import InputText from "primevue/inputtext";
 import DatePicker from "primevue/datepicker";
-import Textarea from "primevue/textarea";
 import Button from "primevue/button";
 import DataTable from "primevue/datatable";
 import Column from "primevue/column";
-import Tag from "primevue/tag"; // 상태 표시용 태그 추가
-import Editor from "../Editor.vue";
+import Tag from "primevue/tag";
 
-const projects = ref([
-  {
-    id: 1,
-    title: "미래에셋생명 경험위험률산출 시스템",
-    period: [new Date(2025, 2, 1), new Date(2026, 0, 1)],
-    role: "솔루션 기술 지원 및 엔지니어링",
-    client: "미래에셋셍명",
-    position: "큐핏 / 선임연구원",
-    desc: "고객사 내부망 환경 내 인프라 구축 주도 및 SSO/DRM 연동 최적화.",
-  },
-]);
-
+// 상태 관리 변수
+const projects = ref([]); // 리스트 데이터 (백엔드의 certificates)
 const isEditing = ref(false);
-const currentProject = ref({
-  id: null,
-  title: "",
-  period: null,
-  role: "",
-  client: "",
-  position: "",
-  desc: "",
+const currentCertificate = ref({
+  idx: null,
+  name: "",
+  organization: "",
+  obtainedDate: null,
 });
 
-const formatDate = (dateRange) => {
-  if (!dateRange || !dateRange[0]) return "-";
-  const start = dateRange[0].toLocaleDateString("ko-KR");
-  const end = dateRange[1]
-    ? dateRange[1].toLocaleDateString("ko-KR")
-    : "진행중";
-  return `${start} ~ ${end}`;
-};
-
-const saveProject = () => {
-  if (!currentProject.value.title) return;
-  if (isEditing.value) {
-    const index = projects.value.findIndex(
-      (p) => p.id === currentProject.value.id,
-    );
-    projects.value[index] = { ...currentProject.value };
-  } else {
-    projects.value.push({ ...currentProject.value, id: Date.now() });
+// 1. 데이터 불러오기
+const getAllCertificates = async () => {
+  try {
+    const res = await axios.get("/api/manager/getAllCertificates");
+    // 날짜 문자열을 Date 객체로 변환하여 DatePicker와 호환되게 함
+    projects.value = res.data.map((item) => ({
+      ...item,
+      obtainedDate: item.obtainedDate ? new Date(item.obtainedDate) : null,
+    }));
+  } catch (error) {
+    console.error("데이터 로드 실패:", error);
   }
-  resetForm();
 };
 
-const editProject = (data) => {
+// 2. 저장/수정 로직
+const saveCertificate = async () => {
+  if (!currentCertificate.value.name) {
+    alert("자격증명을 입력해주세요.");
+    return;
+  }
+
+  try {
+    // 백엔드 Certificate DTO 구조에 맞게 전송
+    await axios.post("/api/manager/addCertificate", currentCertificate.value);
+    await getAllCertificates(); // 목록 새로고침
+    resetForm();
+  } catch (error) {
+    console.error("저장 실패:", error);
+  }
+};
+
+// 3. 삭제 로직
+const deleteCertificate = async (idx) => {
+  if (confirm("이 자격증 정보를 삭제하시겠습니까?")) {
+    try {
+      await axios.delete(`/api/manager/deleteCertificate/${idx}`);
+      await getAllCertificates();
+    } catch (error) {
+      console.error("삭제 실패:", error);
+    }
+  }
+};
+
+// 4. 수정 모드 진입
+const editCertificate = (data) => {
   isEditing.value = true;
-  currentProject.value = { ...data };
-  window.scrollTo({ top: 0, behavior: "smooth" }); // 수정 시 상단 폼으로 이동
+  // 기존 데이터를 복사하고, 날짜는 Date 객체인지 확인
+  currentCertificate.value = {
+    ...data,
+    obtainedDate: data.obtainedDate ? new Date(data.obtainedDate) : null,
+  };
+  window.scrollTo({ top: 0, behavior: "smooth" });
 };
 
-const deleteProject = (id) => {
-  if (confirm("이 자격증를 삭제하시겠습니까?")) {
-    projects.value = projects.value.filter((p) => p.id !== id);
-  }
-};
-
+// 5. 폼 초기화
 const resetForm = () => {
-  currentProject.value = {
-    id: null,
-    title: "",
-    period: null,
-    role: "",
-    client: "",
-    position: "",
-    desc: "",
+  currentCertificate.value = {
+    idx: null,
+    name: "",
+    organization: "",
+    obtainedDate: null,
   };
   isEditing.value = false;
 };
-const placeholder = ref("상세내용");
+
+// 6. 날짜 포맷팅 (단일 날짜 표시용)
+const formatDate = (date) => {
+  if (!date) return "-";
+  const d = new Date(date);
+  return d.toLocaleDateString("ko-KR"); // "2026. 3. 30." 형태
+};
+
+onMounted(() => {
+  getAllCertificates();
+});
 </script>
 
 <template>
-  <div>
+  <div class="admin-wrapper">
     <div class="header-section">
       <h2 class="title">Certification Portfolio Management</h2>
       <p class="subtitle">자격증 이력을 관리합니다.</p>
@@ -100,7 +114,7 @@ const placeholder = ref("상세내용");
             <div class="field full-width">
               <label>자격증명</label>
               <InputText
-                v-model="currentProject.title"
+                v-model="currentCertificate.name"
                 placeholder="자격증 타이틀"
                 class="w-full"
               />
@@ -108,25 +122,21 @@ const placeholder = ref("상세내용");
 
             <div class="field full-width">
               <label>발급기관</label>
-              <InputText v-model="currentProject.client" class="w-full" />
+              <InputText
+                v-model="currentCertificate.organization"
+                placeholder="기관명"
+                class="w-full"
+              />
             </div>
 
             <div class="field">
               <label>취득일자</label>
               <DatePicker
-                v-model="currentProject.period"
+                v-model="currentCertificate.obtainedDate"
                 :manualInput="false"
                 showIcon
                 fluid
-                placeholder="취득일"
-              />
-            </div>
-            <div class="field full-width">
-              <label>상세 내용</label>
-              <Editor
-                ref="myEditor"
-                @update="autoSaveSchedule"
-                :placeholder-text="`${placeholder}`"
+                placeholder="취득일 선택"
               />
             </div>
           </div>
@@ -140,14 +150,12 @@ const placeholder = ref("상세내용");
             severity="secondary"
             text
             @click="resetForm"
-            class="flex-1"
           />
           <Button
             :label="isEditing ? '변경사항 저장' : '등록하기'"
             :icon="isEditing ? 'pi pi-save' : 'pi pi-check'"
             :severity="isEditing ? 'info' : 'success'"
-            @click="saveProject"
-            class="px-5"
+            @click="saveCertificate"
           />
         </div>
       </div>
@@ -157,40 +165,49 @@ const placeholder = ref("상세내용");
           :value="projects"
           tableStyle="min-width: 50rem"
           paginator
-          :rows="5"
+          :rows="10"
           removableSort
         >
           <Column
-            field="title"
+            field="name"
             header="자격증명"
             sortable
-            style="width: 30%"
+            style="width: 40%"
           ></Column>
-          <Column header="취득일자" style="width: 20%">
+          <Column
+            header="취득일자"
+            sortable
+            field="obtainedDate"
+            style="width: 20%"
+          >
             <template #body="slotProps">
               <Tag
-                :value="formatDate(slotProps.data.period)"
+                :value="formatDate(slotProps.data.obtainedDate)"
                 severity="secondary"
               />
             </template>
           </Column>
-          <Column field="client" header="발급기관" style="width: 15%"></Column>
+          <Column
+            field="organization"
+            header="발급기관"
+            style="width: 25%"
+          ></Column>
           <Column header="관리" style="width: 15%">
             <template #body="slotProps">
-              <div class="flex gap-3">
+              <div class="flex gap-2">
                 <Button
                   icon="pi pi-file-edit"
                   text
                   rounded
                   severity="info"
-                  @click="editProject(slotProps.data)"
+                  @click="editCertificate(slotProps.data)"
                 />
                 <Button
                   icon="pi pi-trash"
                   text
                   rounded
                   severity="danger"
-                  @click="deleteProject(slotProps.data.id)"
+                  @click="deleteCertificate(slotProps.data.idx)"
                 />
               </div>
             </template>
@@ -204,10 +221,7 @@ const placeholder = ref("상세내용");
 <style scoped>
 /* 전체 컨테이너 */
 .admin-wrapper {
-  max-width: 1200px;
   margin: 0 auto;
-  padding: 2rem 1rem;
-  background-color: #f8f9fa;
   min-height: 100vh;
 }
 

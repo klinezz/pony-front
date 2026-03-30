@@ -32,6 +32,7 @@ import ManagerIndex from "@/components/Manager/Index.vue";
 import ManagerCompany from "@/components/Manager/Company.vue";
 import ManagerProject from "@/components/Manager/Project.vue";
 import ManagerCertification from "@/components/Manager/Certification.vue";
+import ManagerSkill from "@/components/Manager/Skill.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -249,6 +250,17 @@ const router = createRouter({
               components: {
                 default: ManagerIndex,
                 detail: ManagerCertification,
+              },
+            },
+            {
+              path: "skill",
+              meta: {
+                label: "기술 관리",
+                icon: "pi pi-hammer",
+              },
+              components: {
+                default: ManagerIndex,
+                detail: ManagerSkill,
               },
             },
           ],
